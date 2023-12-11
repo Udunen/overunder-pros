@@ -22,7 +22,7 @@ lemlib::Drivetrain_t drivetrain {
 
 pros::Motor			flyWheel(1, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(3, MOTOR_GEAR_GREEN, false);
-pros::Motor			arm(2, MOTOR_GEAR_GREEN, true);
+pros::Motor			arm(2, MOTOR_GEAR_GREEN, false);
 
 pros::ADIDigitalOut	wings('A', false);
 
@@ -53,7 +53,6 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
-
 	
 }
 
@@ -102,9 +101,9 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	
+
 	double drive, turn;
-	bool wingToggle;
+	bool wingToggle = false;
 
 	while (true) {
 		drive = master.get_analog(ANALOG_LEFT_Y);
@@ -138,11 +137,16 @@ void opcontrol() {
 		}
 
 		// toggles pneumatics for wings
-		// currently doesnt work need to fix
-		if(master.get_digital(DIGITAL_A) == 1) {
-			wingToggle ^= false;
+		// wont work if its anything else idk why
+		if(master.get_digital_new_press(DIGITAL_A)) {
+			if(wingToggle == false) {
+				wings.set_value(true);
+				wingToggle = true;
+			} else {
+				wings.set_value(false);
+				wingToggle = false;
+			}
 		}
-		wings.set_value(wingToggle);
 
 	}
 }
