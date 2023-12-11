@@ -1,4 +1,30 @@
 #include "main.h"
+#include "lemlib/api.hpp"
+
+pros::Controller	master(pros::E_CONTROLLER_MASTER);
+//double check the reverse booleans
+pros::Motor			left_front(19, MOTOR_GEAR_BLUE, true);
+pros::Motor			left_mid(17, MOTOR_GEAR_BLUE, true);
+pros::Motor			left_back(18, MOTOR_GEAR_BLUE, true);
+pros::Motor			right_front(8, MOTOR_GEAR_BLUE, false);
+pros::Motor			right_mid(9, MOTOR_GEAR_BLUE, false);
+pros::Motor			right_back(7,  MOTOR_GEAR_BLUE, false);
+pros::Motor_Group	left_drive({left_front, left_mid, left_back});
+pros::Motor_Group	right_drive({right_front, right_mid, right_back});
+lemlib::Drivetrain_t drivetrain {
+    &left_drive, // left drivetrain motors
+    &right_drive, // right drivetrain motors
+    13, // track width
+    3.25, // wheel diameter
+    600 // wheel rpm
+};
+// need to setup tracking wheel for drivetrain
+
+pros::Motor			flyWheel(1, MOTOR_GEAR_BLUE, false);
+pros::Motor			intake(3, MOTOR_GEAR_GREEN, false);
+pros::Motor			arm(2, MOTOR_GEAR_GREEN, true);
+
+pros::ADIDigitalOut	wings('A', false);
 
 /**
  * A callback function for LLEMU's center button.
@@ -27,6 +53,8 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+
+	
 }
 
 /**
@@ -74,66 +102,47 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller	master(pros::E_CONTROLLER_MASTER);
-
-	/*
-	left front - 19
-	left mid - 17
-	left back - 18
-	right front - 8
-	right mid - 9
-	right back - 7
-	*/
-	//double check the reverse booleans
-	pros::Motor			left_front(19, MOTOR_GEAR_BLUE, false);
-	pros::Motor			left_mid(17, MOTOR_GEAR_BLUE, false);
-	pros::Motor			left_back(18, MOTOR_GEAR_BLUE, false);
-	pros::Motor			right_front(8, MOTOR_GEAR_BLUE, false);
-	pros::Motor			right_mid(9, MOTOR_GEAR_BLUE, false);
-	pros::Motor			right_back(7,  MOTOR_GEAR_BLUE, false);
-	pros::Motor_Group	left_drive({19, 17, 18});
-	pros::Motor_Group	right_drive({8, 9, 7});
-	pros::Motor			flyWheel(1, MOTOR_GEAR_BLUE, false);
-
-
-	/*
-	intake - 3
-	arm - 2
-	shooter - 1
-	*/
-	//make sure u set the gearset and reverse booleans
-	pros::Motor			intake(3, false);
-	pros::Motor			arm(2, false);
-	pros::Motor			shooter(1, false);
-
-	//change from 0 when figure out real port lol
-	pros::ADIDigitalOut	wings('A', false);
 	
 	double drive, turn;
-	int wingToggle;
+	bool wingToggle;
 
 	while (true) {
 		drive = master.get_analog(ANALOG_LEFT_Y);
 		turn = master.get_analog(ANALOG_RIGHT_X) / 1.5;
-	
+		arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 
 		// uncomment when ready to drive
-		// left_drive.move_velocity((drive + turn)*6);
-		// right_drive.move_velocity((drive - turn)*6);
+		// also we change to LemLib driving bc its better pepega, we just have this rn for testing purposes :)
+		// since its a blue motor, we have to multiply the velocity by 6 because pros is weird and move_velocity() reads in +/- 600 for blues
+		left_drive.move_velocity((drive + turn)*6);
+		right_drive.move_velocity((drive - turn)*6);
 
+		// set button bindings and velocity of the intake. we multiply the percent by 2 because its a green motor,
+		// 		and move_velocity() reads in +/- 200 for green motors. also we want to make code easier to read
+		//		if u want to change the percent speed that the motor moves, change the number being mutiplied by 2
 		if(master.get_digital(DIGITAL_B) == 1) {
-			// intake.set_velocity();
+			intake.move_velocity(50*2);
+		} else if (master.get_digital(DIGITAL_Y) == 1) {
+			intake.move_velocity(-50*2);
+		} else {
+			intake.move_velocity(0);
 		}
 
+		// set button bindings and velocity of arm. again multiply by 2
+		if(master.get_digital(DIGITAL_R2) == 1) {
+			arm.move_velocity(50*2);
+		} else if(master.get_digital(DIGITAL_R1) == 1) {
+			arm.move_velocity(-50*2);
+		} else {
+			arm.move_velocity(0);
+		}
+
+		// toggles pneumatics for wings
+		// currently doesnt work need to fix
 		if(master.get_digital(DIGITAL_A) == 1) {
-			if(wingToggle == 1) {
-				wingToggle == 0;
-			} else {
-				wingToggle == 1;
-			}
+			wingToggle ^= false;
 		}
 		wings.set_value(wingToggle);
-
 
 	}
 }
