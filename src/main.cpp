@@ -2,7 +2,7 @@
 #include "lemlib/api.hpp"
 
 pros::Controller	master(pros::E_CONTROLLER_MASTER);
-//double check the reverse booleans
+
 pros::Motor			left_front(19, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_mid(17, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_back(18, MOTOR_GEAR_BLUE, true);
@@ -11,14 +11,56 @@ pros::Motor			right_mid(9, MOTOR_GEAR_BLUE, false);
 pros::Motor			right_back(7,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
-lemlib::Drivetrain_t drivetrain {
-    &left_drive, // left drivetrain motors
-    &right_drive, // right drivetrain motors
-    13, // track width
-    3.25, // wheel diameter
-    600 // wheel rpm
-};
-// need to setup tracking wheel for drivetrain
+// lemlib::Drivetrain_t drivetrain {
+//     &left_drive, // left drivetrain motors
+//     &right_drive, // right drivetrain motors
+//     13, // track width
+//     3.25, // wheel diameter
+//     600 // wheel rpm
+// };
+// pros::ADIEncoder	xTracking('B', 'C', false);
+// pros::ADIEncoder	yTracking('D', 'E', false);
+// lemlib::TrackingWheel x_tracking_wheel(
+// 	&xTracking, // encoder
+// 	2.75, // " wheel diameter
+// 	4.3, // " offset from tracking center
+// 	1 // gear ratio
+// );
+// lemlib::TrackingWheel y_tracking_wheel(
+// 	&yTracking, // encoder
+// 	2.75, // " wheel diameter
+// 	4.3, // " offset from tracking center
+// 	1 // gear ratio
+// );
+// pros::Imu			inertial_sensor(2);
+// lemlib::OdomSensors_t sensors {
+//     &x_tracking_wheel, // vertical tracking wheel 1
+//     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
+//     &y_tracking_wheel, // horizontal tracking wheel 1
+//     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
+//     &inertial_sensor // inertial sensor
+// };
+// // forward/backward PID (untuned)
+// lemlib::ChassisController_t lateralController {
+//     8, // kP
+//     30, // kD
+//     1, // smallErrorRange
+//     100, // smallErrorTimeout
+//     3, // largeErrorRange
+//     500, // largeErrorTimeout
+//     5 // slew rate
+// };
+// // turning PID (untuned)
+// lemlib::ChassisController_t angularController {
+//     4, // kP
+//     40, // kD
+//     1, // smallErrorRange
+//     100, // smallErrorTimeout
+//     3, // largeErrorRange
+//     500, // largeErrorTimeout
+//     0 // slew rate
+// };
+// lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
 pros::Motor			flyWheel(1, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(3, MOTOR_GEAR_GREEN, false);
@@ -110,9 +152,8 @@ void opcontrol() {
 		turn = master.get_analog(ANALOG_RIGHT_X) / 1.5;
 		arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 
-		// uncomment when ready to drive
 		// also we change to LemLib driving bc its better pepega, we just have this rn for testing purposes :)
-		// since its a blue motor, we have to multiply the velocity by 6 because pros is weird and move_velocity() reads in +/- 600 for blues
+		// since its a blue motor, we have to multiply the velocity by 6 because pros is weird and asks for the rpm instead of percent speed
 		left_drive.move_velocity((drive + turn)*6);
 		right_drive.move_velocity((drive - turn)*6);
 
