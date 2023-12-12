@@ -14,29 +14,34 @@ pros::Motor_Group	right_drive({right_front, right_mid, right_back});
 // lemlib::Drivetrain_t drivetrain {
 //     &left_drive, // left drivetrain motors
 //     &right_drive, // right drivetrain motors
-//     13, // track width
+//     12.5, // track width
 //     3.25, // wheel diameter
-//     600 // wheel rpm
+//     0 // wheel rpm
 // };
 // pros::ADIEncoder	xTracking('B', 'C', false);
-// pros::ADIEncoder	yTracking('D', 'E', false);
+// lemlib::TrackingWheel left_tracking_wheel(
+// 	&left_drive, // encoder
+// 	3.25, // " wheel diameter
+// 	-6.375, // " offset from tracking center
+// 	4/3 // gear ratio
+// );
+// lemlib::TrackingWheel right_tracking_wheel(
+// 	&right_drive, // encoder
+// 	3.25, // " wheel diameter
+// 	6.375, // " offset from tracking center
+// 	4/3 // gear ratio
+// );
 // lemlib::TrackingWheel x_tracking_wheel(
 // 	&xTracking, // encoder
-// 	2.75, // " wheel diameter
-// 	4.3, // " offset from tracking center
-// 	1 // gear ratio
-// );
-// lemlib::TrackingWheel y_tracking_wheel(
-// 	&yTracking, // encoder
-// 	2.75, // " wheel diameter
-// 	4.3, // " offset from tracking center
-// 	1 // gear ratio
+// 	0, // " wheel diameter
+// 	0, // " offset from tracking center
+// 	0 // gear ratio
 // );
 // pros::Imu			inertial_sensor(2);
 // lemlib::OdomSensors_t sensors {
-//     &x_tracking_wheel, // vertical tracking wheel 1
-//     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
-//     &y_tracking_wheel, // horizontal tracking wheel 1
+//     &left_tracking_wheel, // vertical tracking wheel 1
+//     &right_tracking_wheel, // vertical tracking wheel 2
+//     &x_tracking_wheel, // horizontal tracking wheel 1
 //     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
 //     &inertial_sensor // inertial sensor
 // };
