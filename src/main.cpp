@@ -3,6 +3,10 @@
 
 pros::Controller	master(pros::E_CONTROLLER_MASTER);
 
+// 36:1, 100 RPM, Red gear set
+// 18:1, 200 RPM, Green gear set
+// 6:1, 600 RPM, Blue gear set
+
 pros::Motor			left_front(19, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_mid(17, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_back(18, MOTOR_GEAR_BLUE, true);
@@ -165,18 +169,18 @@ void opcontrol() {
 		// set button bindings and velocity of the intake. we multiply the percent by 2 because its a green motor,
 		// 		and move_velocity() reads in +/- 200 for green motors. also we want to make code easier to read
 		//		if u want to change the percent speed that the motor moves, change the number being mutiplied by 2
-		if(master.get_digital(DIGITAL_B) == 1) {
+		if(master.get_digital(DIGITAL_B)) {
 			intake.move_velocity(50*2);
-		} else if (master.get_digital(DIGITAL_Y) == 1) {
+		} else if (master.get_digital(DIGITAL_Y)) {
 			intake.move_velocity(-50*2);
 		} else {
 			intake.move_velocity(0);
 		}
 
 		// set button bindings and velocity of arm. again multiply by 2
-		if(master.get_digital(DIGITAL_R2) == 1) {
+		if(master.get_digital(DIGITAL_R2)) {
 			arm.move_velocity(50*2);
-		} else if(master.get_digital(DIGITAL_R1) == 1) {
+		} else if(master.get_digital(DIGITAL_R1)) {
 			arm.move_velocity(-50*2);
 		} else {
 			arm.move_velocity(0);
@@ -194,5 +198,14 @@ void opcontrol() {
 			}
 		}
 
+		// shooter :)
+		// multiply pct speed by 6 bc its a blue motor
+		if(master.get_digital(DIGITAL_UP)) {
+			flyWheel.move_velocity(50*6);
+		} else if (master.get_digital(DIGITAL_DOWN)) {
+			flyWheel.move_velocity(-50*6);
+		} else {
+			flyWheel.move_velocity(0);
+		}
 	}
 }
