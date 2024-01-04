@@ -15,61 +15,61 @@ pros::Motor			right_mid(9, MOTOR_GEAR_BLUE, false);
 pros::Motor			right_back(7,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
-// lemlib::Drivetrain_t drivetrain {
-//     &left_drive, // left drivetrain motors
-//     &right_drive, // right drivetrain motors
-//     12.5, // track width
-//     3.25, // wheel diameter
-//     0 // wheel rpm
-// };
-// pros::ADIEncoder	xTracking('B', 'C', false);
-// lemlib::TrackingWheel left_tracking_wheel(
-// 	&left_drive, // encoder
-// 	3.25, // " wheel diameter
-// 	-6.375, // " offset from tracking center
-// 	4/3 // gear ratio
-// );
-// lemlib::TrackingWheel right_tracking_wheel(
-// 	&right_drive, // encoder
-// 	3.25, // " wheel diameter
-// 	6.375, // " offset from tracking center
-// 	4/3 // gear ratio
-// );
-// lemlib::TrackingWheel x_tracking_wheel(
-// 	&xTracking, // encoder
-// 	0, // " wheel diameter
-// 	0, // " offset from tracking center
-// 	0 // gear ratio
-// );
-// pros::Imu			inertial_sensor(2);
-// lemlib::OdomSensors_t sensors {
-//     &left_tracking_wheel, // vertical tracking wheel 1
-//     &right_tracking_wheel, // vertical tracking wheel 2
-//     &x_tracking_wheel, // horizontal tracking wheel 1
-//     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
-//     &inertial_sensor // inertial sensor
-// };
-// // forward/backward PID (untuned)
-// lemlib::ChassisController_t lateralController {
-//     8, // kP
-//     30, // kD
-//     1, // smallErrorRange
-//     100, // smallErrorTimeout
-//     3, // largeErrorRange
-//     500, // largeErrorTimeout
-//     5 // slew rate
-// };
-// // turning PID (untuned)
-// lemlib::ChassisController_t angularController {
-//     4, // kP
-//     40, // kD
-//     1, // smallErrorRange
-//     100, // smallErrorTimeout
-//     3, // largeErrorRange
-//     500, // largeErrorTimeout
-//     0 // slew rate
-// };
-// lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
+lemlib::Drivetrain_t drivetrain {
+    &left_drive, // left drivetrain motors
+    &right_drive, // right drivetrain motors
+    12.5, // track width
+    3.25, // wheel diameter
+    0 // wheel rpm
+};
+pros::Rotation xTracking(16, true);
+lemlib::TrackingWheel left_tracking_wheel(
+	&left_drive, // encoder
+	3.25, // " wheel diameter
+	-6.375, // " offset from tracking center
+	4/3 // gear ratio
+);
+lemlib::TrackingWheel right_tracking_wheel(
+	&right_drive, // encoder
+	3.25, // " wheel diameter
+	6.375, // " offset from tracking center
+	4/3 // gear ratio
+);
+lemlib::TrackingWheel x_tracking_wheel(
+	&xTracking, // encoder
+	3.25, // " wheel diameter
+	-6.125, // " offset from tracking center
+	1 // gear ratio
+);
+pros::Imu			inertial_sensor(2);
+lemlib::OdomSensors_t sensors {
+    &left_tracking_wheel, // vertical tracking wheel 1
+    &right_tracking_wheel, // vertical tracking wheel 2
+    &x_tracking_wheel, // horizontal tracking wheel 1
+    nullptr, // we don't have a second tracking wheel, so we set it to nullptr
+    &inertial_sensor // inertial sensor
+};
+// forward/backward PID (untuned)
+lemlib::ChassisController_t lateralController {
+    8, // kP
+    30, // kD
+    1, // smallErrorRange
+    100, // smallErrorTimeout
+    3, // largeErrorRange
+    500, // largeErrorTimeout
+    5 // slew rate
+};
+// turning PID (untuned)
+lemlib::ChassisController_t angularController {
+    4, // kP
+    40, // kD
+    1, // smallErrorRange
+    100, // smallErrorTimeout
+    3, // largeErrorRange
+    500, // largeErrorTimeout
+    0 // slew rate
+};
+lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
 pros::Motor			flyWheel(1, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(3, MOTOR_GEAR_GREEN, false);
