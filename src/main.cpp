@@ -38,7 +38,7 @@ lemlib::TrackingWheel right_tracking_wheel(
 lemlib::TrackingWheel x_tracking_wheel(
 	&xTracking, // encoder
 	3.25, // " wheel diameter
-	-6.125, // " offset from tracking center
+	-6.25, // " offset from tracking center
 	1 // gear ratio
 );
 lemlib::OdomSensors_t sensors {
