@@ -7,12 +7,12 @@ pros::Controller	master(pros::E_CONTROLLER_MASTER);
 // 18:1, 200 RPM, Green gear set
 // 6:1, 600 RPM, Blue gear set
 
-pros::Motor			left_front(19, MOTOR_GEAR_BLUE, true);
-pros::Motor			left_mid(17, MOTOR_GEAR_BLUE, true);
-pros::Motor			left_back(18, MOTOR_GEAR_BLUE, true);
-pros::Motor			right_front(8, MOTOR_GEAR_BLUE, false);
-pros::Motor			right_mid(9, MOTOR_GEAR_BLUE, false);
-pros::Motor			right_back(7,  MOTOR_GEAR_BLUE, false);
+pros::Motor			left_front(1, MOTOR_GEAR_BLUE, true);
+pros::Motor			left_mid(3, MOTOR_GEAR_BLUE, true);
+pros::Motor			left_back(2, MOTOR_GEAR_BLUE, true);
+pros::Motor			right_front(4, MOTOR_GEAR_BLUE, false);
+pros::Motor			right_mid(5, MOTOR_GEAR_BLUE, false);
+pros::Motor			right_back(6,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
 lemlib::Drivetrain_t drivetrain {
@@ -22,7 +22,7 @@ lemlib::Drivetrain_t drivetrain {
     3.25, // wheel diameter
     0 // wheel rpm
 };
-pros::Rotation xTracking(16, true);
+pros::Rotation xTracking(7, true);
 lemlib::TrackingWheel left_tracking_wheel(
 	&left_drive, // encoder
 	3.25, // " wheel diameter
@@ -41,18 +41,17 @@ lemlib::TrackingWheel x_tracking_wheel(
 	-6.125, // " offset from tracking center
 	1 // gear ratio
 );
-pros::Imu			inertial_sensor(2);
 lemlib::OdomSensors_t sensors {
     &left_tracking_wheel, // vertical tracking wheel 1
     &right_tracking_wheel, // vertical tracking wheel 2
     &x_tracking_wheel, // horizontal tracking wheel 1
     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
-    &inertial_sensor // inertial sensor
+    nullptr // inertial sensor
 };
 // forward/backward PID (untuned)
 lemlib::ChassisController_t lateralController {
-    8, // kP
-    30, // kD
+    0, // kP
+    0, // kD
     1, // smallErrorRange
     100, // smallErrorTimeout
     3, // largeErrorRange
@@ -61,8 +60,8 @@ lemlib::ChassisController_t lateralController {
 };
 // turning PID (untuned)
 lemlib::ChassisController_t angularController {
-    4, // kP
-    40, // kD
+    0, // kP
+    0, // kD
     1, // smallErrorRange
     100, // smallErrorTimeout
     3, // largeErrorRange
@@ -71,26 +70,21 @@ lemlib::ChassisController_t angularController {
 };
 lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
-pros::Motor			flyWheel(1, MOTOR_GEAR_BLUE, false);
-pros::Motor			intake(3, MOTOR_GEAR_GREEN, false);
-pros::Motor			arm(2, MOTOR_GEAR_GREEN, false);
+pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
+pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
+pros::Motor			arm(8, MOTOR_GEAR_GREEN, false);
 
 pros::ADIDigitalOut	wings('A', false);
 
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
+
+void screen() {
+	while (true) {
+        lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
+        pros::lcd::print(0, "x: %f", pose.x); // print the x position
+        pros::lcd::print(1, "y: %f", pose.y); // print the y position
+        pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
+        pros::delay(10);
+    }
 }
 
 /**
@@ -101,10 +95,9 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
-	
+	chassis.calibrate();
+	chassis.setPose(0, 0, 0);
+	pros::Task screenTask(screen);
 }
 
 /**
@@ -166,22 +159,30 @@ void opcontrol() {
 		left_drive.move_velocity((drive + turn)*6);
 		right_drive.move_velocity((drive - turn)*6);
 
+		if(master.get_digital_new_press(DIGITAL_LEFT)) {
+			chassis.moveTo(10, 0, 1000, 100, true);
+		}
+
+		if(master.get_digital_new_press(DIGITAL_RIGHT)) {
+			chassis.turnTo(30, 0, 1000, false, 100, true);
+		}
+
 		// set button bindings and velocity of the intake. we multiply the percent by 2 because its a green motor,
 		// 		and move_velocity() reads in +/- 200 for green motors. also we want to make code easier to read
 		//		if u want to change the percent speed that the motor moves, change the number being mutiplied by 2
-		if(master.get_digital(DIGITAL_B)) {
-			intake.move_velocity(50*2);
-		} else if (master.get_digital(DIGITAL_Y)) {
-			intake.move_velocity(-50*2);
+		if(master.get_digital(DIGITAL_R2)) {
+			intake.move_voltage(12000);
+		} else if (master.get_digital(DIGITAL_R1)) {
+			intake.move_voltage(-12000);
 		} else {
 			intake.move_velocity(0);
 		}
 
 		// set button bindings and velocity of arm. again multiply by 2
-		if(master.get_digital(DIGITAL_R2)) {
-			arm.move_velocity(50*2);
-		} else if(master.get_digital(DIGITAL_R1)) {
-			arm.move_velocity(-50*2);
+		if(master.get_digital(DIGITAL_UP)) {
+			arm.move_voltage(6000);
+		} else if(master.get_digital(DIGITAL_DOWN)) {
+			arm.move_voltage(-6000);
 		} else {
 			arm.move_velocity(0);
 		}
@@ -200,10 +201,10 @@ void opcontrol() {
 
 		// shooter :)
 		// multiply pct speed by 6 bc its a blue motor
-		if(master.get_digital(DIGITAL_UP)) {
-			flyWheel.move_velocity(50*6);
-		} else if (master.get_digital(DIGITAL_DOWN)) {
-			flyWheel.move_velocity(-50*6);
+		if(master.get_digital(DIGITAL_L2)) {
+			flyWheel.move_voltage(11000);
+		} else if (master.get_digital(DIGITAL_L1)) {
+			flyWheel.move_voltage(-11000);
 		} else {
 			flyWheel.move_velocity(0);
 		}
