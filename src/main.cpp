@@ -129,7 +129,22 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	/*for skills:
+		ace robot :3
+		1. start on the right side of the blue net, in front of the corner, with wings facing the corner
+		2. use wing to push preloaded triball towards the goal
+		3. move up against the match load corner, shooter facing the red net
+		4. run shooter for 30 seconds
+		5. turn and push the red triball from earlier into the blue net
+		6. go to other side, as ur going over the middle bar, pick up one of the triballs preset there
+		7. push all of the triballs u shot into the red net
+
+		also we should install gps, inertial sensor, and vision sensor for best results
+	*/
+
+
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -151,7 +166,7 @@ void opcontrol() {
 
 	while (true) {
 		drive = master.get_analog(ANALOG_LEFT_Y);
-		turn = master.get_analog(ANALOG_RIGHT_X) / 1.5;
+		turn = master.get_analog(ANALOG_RIGHT_X) / 2.5 * ((int)(abs(drive)/60)*0.5+1);
 		arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 
 		// also we change to LemLib driving bc its better pepega, we just have this rn for testing purposes :)
