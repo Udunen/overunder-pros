@@ -12,29 +12,39 @@ pros::Motor			left_mid(3, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_back(2, MOTOR_GEAR_BLUE, true);
 pros::Motor			right_front(4, MOTOR_GEAR_BLUE, false);
 pros::Motor			right_mid(5, MOTOR_GEAR_BLUE, false);
-pros::Motor			right_back(6,  MOTOR_GEAR_BLUE, false);
+pros::Motor			right_back(17,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
+pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
+pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
+pros::Motor			arm(8, MOTOR_GEAR_GREEN, false);
+pros::ADIDigitalOut	wings('A', false);
+pros::Imu			imu(13);
+pros::Rotation 		xTracking(7, true);
+
+
 lemlib::Drivetrain_t drivetrain {
     &left_drive, // left drivetrain motors
     &right_drive, // right drivetrain motors
-    12.5, // track width
+    12.4375, // track width
     3.25, // wheel diameter
-    0 // wheel rpm
+    360 // wheel rpm
 };
-pros::Rotation xTracking(7, true);
+
 lemlib::TrackingWheel left_tracking_wheel(
 	&left_drive, // encoder
 	3.25, // " wheel diameter
-	-6.375, // " offset from tracking center
-	4/3 // gear ratio
+	-12.4375/2, // " offset from tracking center
+	5.0/3.0 // gear ratio
 );
+
 lemlib::TrackingWheel right_tracking_wheel(
 	&right_drive, // encoder
 	3.25, // " wheel diameter
-	6.375, // " offset from tracking center
-	4/3 // gear ratio
+	12.4375/2, // " offset from tracking center
+	5.0/3.0 // gear ratio
 );
+
 lemlib::TrackingWheel x_tracking_wheel(
 	&xTracking, // encoder
 	3.25, // " wheel diameter
@@ -50,13 +60,13 @@ lemlib::OdomSensors_t sensors {
 };
 // forward/backward PID (untuned)
 lemlib::ChassisController_t lateralController {
-    0, // kP
+    10, // kP
     0, // kD
     1, // smallErrorRange
     100, // smallErrorTimeout
     3, // largeErrorRange
     500, // largeErrorTimeout
-    5 // slew rate
+    3 // slew rate
 };
 // turning PID (untuned)
 lemlib::ChassisController_t angularController {
@@ -70,21 +80,23 @@ lemlib::ChassisController_t angularController {
 };
 lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
-pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
-pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
-pros::Motor			arm(8, MOTOR_GEAR_GREEN, false);
 
-pros::ADIDigitalOut	wings('A', false);
 
 
 void screen() {
+	// while (true) {
+    //     lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
+    //     pros::lcd::print(0, "x: %f", pose.x); // print the x position
+    //     pros::lcd::print(1, "y: %f", pose.y); // print the y position
+    //     pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
+    //     pros::delay(10);
+    // }
 	while (true) {
-        lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
-        pros::lcd::print(0, "x: %f", pose.x); // print the x position
-        pros::lcd::print(1, "y: %f", pose.y); // print the y position
-        pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
-        pros::delay(10);
-    }
+		// pros::lcd::print(0, "arm: %f", arm.get_position());
+		master.print(0, 0, "arm: %f", arm.get_position());
+		master.clear_line(0);
+		pros::delay(10);
+	}
 }
 
 /**
@@ -98,6 +110,7 @@ void initialize() {
 	chassis.calibrate();
 	chassis.setPose(0, 0, 0);
 	pros::Task screenTask(screen);
+	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 }
 
 /**
@@ -130,19 +143,33 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	/*for skills:
-		ace robot :3
-		1. start on the right side of the blue net, in front of the corner, with wings facing the corner
-		2. use wing to push preloaded triball towards the goal
-		3. move up against the match load corner, shooter facing the red net
-		4. run shooter for 30 seconds
-		5. turn and push the red triball from earlier into the blue net
-		6. go to other side, as ur going over the middle bar, pick up one of the triballs preset there
-		7. push all of the triballs u shot into the red net
+	// chassis.calibrate();
+	// chassis.setPose(0, 0, 0);
+	//chassis.moveTo(0, 20, 5);
+	//chassis.moveTo(-12, 24, 5);
 
-		also we should install gps, inertial sensor, and vision sensor for best results
-	*/
-
+	//dont do this until u tune pid or else
+	//chassis.follow("start.txt", 2000, 15, false);
+	// arm.move_voltage(6000);
+	// while(arm.get_position() < 3000){
+	// 	pros::delay(10);
+	// }
+	// arm.move_voltage(-1000);
+	// flyWheel.move_voltage(11000);
+	// pros::delay(30000);
+	// flyWheel.move_voltage(0);
+	// arm.move_absolute(0, -50);
+	// while(arm.get_position() > 0){
+	// 	pros::delay(10);
+	// }  
+	// chassis.follow("afterShooting.txt", 10000, 15, true);
+	// wings.set_value(true);
+	// chassis.follow("wingsOut1.txt", 5000, 15, false);
+	// wings.set_value(false);
+	// chassis.follow("wingsIn1.txt", 5000, 15, false);
+	// wings.set_value(true);
+	// chassis.follow("wingsOut2.txt", 5000, 15, false);
+	// wings.set_value(false);
 
 }
 
@@ -167,20 +194,13 @@ void opcontrol() {
 	while (true) {
 		drive = master.get_analog(ANALOG_LEFT_Y);
 		turn = master.get_analog(ANALOG_RIGHT_X) / 2.5 * ((int)(abs(drive)/60)*0.5+1);
-		arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 
 		// also we change to LemLib driving bc its better pepega, we just have this rn for testing purposes :)
 		// since its a blue motor, we have to multiply the velocity by 6 because pros is weird and asks for the rpm instead of percent speed
 		left_drive.move_velocity((drive + turn)*6);
 		right_drive.move_velocity((drive - turn)*6);
 
-		if(master.get_digital_new_press(DIGITAL_LEFT)) {
-			chassis.moveTo(10, 0, 1000, 100, true);
-		}
-
-		if(master.get_digital_new_press(DIGITAL_RIGHT)) {
-			chassis.turnTo(30, 0, 1000, false, 100, true);
-		}
+		
 
 		// set button bindings and velocity of the intake. we multiply the percent by 2 because its a green motor,
 		// 		and move_velocity() reads in +/- 200 for green motors. also we want to make code easier to read
