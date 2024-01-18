@@ -28,7 +28,7 @@ lemlib::Drivetrain_t drivetrain {
     &right_drive, // right drivetrain motors
     12.4375, // track width
     3.25, // wheel diameter
-    360 // wheel rpm
+    1000 // wheel rpm
 };
 
 lemlib::TrackingWheel left_tracking_wheel(
@@ -58,10 +58,10 @@ lemlib::OdomSensors_t sensors {
     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
     nullptr // inertial sensor
 };
-// forward/backward PID (untuned)
+// forward/backward PID
 lemlib::ChassisController_t lateralController {
-    10, // kP
-    0, // kD
+    6.49, // kP
+    5, // kD
     1, // smallErrorRange
     100, // smallErrorTimeout
     3, // largeErrorRange
@@ -76,7 +76,7 @@ lemlib::ChassisController_t angularController {
     100, // smallErrorTimeout
     3, // largeErrorRange
     500, // largeErrorTimeout
-    0 // slew rate
+	1 // slew rate
 };
 lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
@@ -107,8 +107,6 @@ void screen() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	chassis.calibrate();
-	chassis.setPose(0, 0, 0);
 	pros::Task screenTask(screen);
 	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 }
@@ -143,10 +141,11 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	// chassis.calibrate();
-	// chassis.setPose(0, 0, 0);
-	//chassis.moveTo(0, 20, 5);
-	//chassis.moveTo(-12, 24, 5);
+	chassis.calibrate();
+	chassis.setPose(0, 0, 0);
+	chassis.moveTo(0, 10, 0);
+	// chassis.turnTo(30, 0, 10);
+	// chassis.moveTo(-12, 24, 5);
 
 	//dont do this until u tune pid or else
 	//chassis.follow("start.txt", 2000, 15, false);
