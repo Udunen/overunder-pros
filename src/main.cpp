@@ -108,7 +108,6 @@ void screen() {
 void initialize() {
 	pros::lcd::initialize();
 	pros::Task screenTask(screen);
-	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 }
 
 /**
@@ -141,9 +140,40 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	chassis.calibrate();
-	chassis.setPose(0, 0, 0);
-	chassis.moveTo(0, 10, 0);
+	// chassis.calibrate();
+	// chassis.setPose(0, 0, 0);
+	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+
+	arm.move_voltage(6000);
+	while(arm.get_position() < 1500) {
+		pros::delay(10);
+	}
+	arm.move_voltage(0);
+
+	arm.move_voltage(-6000);
+	while(arm.get_position() > 100) {
+		pros::delay(10);
+	}
+	arm.move_voltage(0);
+
+	left_drive.move_voltage(-6000);
+	right_drive.move_voltage(-6000);
+	pros::delay(2000);
+	left_drive.move_voltage(6000);
+	right_drive.move_voltage(6000);
+	pros::delay(4000);
+	left_drive.move_voltage(0);
+	right_drive.move_voltage(0);
+
+
+	arm.move_voltage(6000);
+	while(arm.get_position() < 1300) {
+		pros::delay(10);
+	}
+	arm.move_voltage(500);
+
+	flyWheel.move_voltage(11000);
+
 	// chassis.turnTo(30, 0, 10);
 	// chassis.moveTo(-12, 24, 5);
 
@@ -189,6 +219,7 @@ void opcontrol() {
 
 	double drive, turn;
 	bool wingToggle = false;
+	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 
 	while (true) {
 		drive = master.get_analog(ANALOG_LEFT_Y);
