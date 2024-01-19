@@ -170,7 +170,7 @@ void autonomous() {
 	while(arm.get_position() < 1300) {
 		pros::delay(10);
 	}
-	arm.move_voltage(500);
+	arm.move_voltage(600);
 
 	flyWheel.move_voltage(11000);
 
