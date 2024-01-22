@@ -15,6 +15,7 @@ pros::Motor			right_mid(5, MOTOR_GEAR_BLUE, false);
 pros::Motor			right_back(17,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
+
 pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
 pros::Motor			arm(8, MOTOR_GEAR_GREEN, false);
@@ -28,32 +29,32 @@ lemlib::Drivetrain_t drivetrain {
     &right_drive, // right drivetrain motors
     12.4375, // track width
     3.25, // wheel diameter
-    1000 // wheel rpm
+    360 // wheel rpm
 };
 
-lemlib::TrackingWheel left_tracking_wheel(
+lemlib::TrackingWheel left_tracking_wheels(
 	&left_drive, // encoder
 	3.25, // " wheel diameter
-	-12.4375/2, // " offset from tracking center
-	5.0/3.0 // gear ratio
+	-12.4375/2.0, // " offset from tracking center
+	1 // gear ratio
 );
 
-lemlib::TrackingWheel right_tracking_wheel(
+lemlib::TrackingWheel right_tracking_wheels(
 	&right_drive, // encoder
 	3.25, // " wheel diameter
-	12.4375/2, // " offset from tracking center
-	5.0/3.0 // gear ratio
+	12.4375/2.0, // " offset from tracking center
+	1 // gear ratio
 );
 
 lemlib::TrackingWheel x_tracking_wheel(
 	&xTracking, // encoder
 	3.25, // " wheel diameter
-	-6.25, // " offset from tracking center
+	-4.5, // " offset from tracking center
 	1 // gear ratio
 );
 lemlib::OdomSensors_t sensors {
-    &left_tracking_wheel, // vertical tracking wheel 1
-    &right_tracking_wheel, // vertical tracking wheel 2
+    nullptr, // vertical tracking wheel 1
+	nullptr, // vertical tracking wheel 2
 	&x_tracking_wheel, // horizontal tracking wheel 1
     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
     &imu // inertial sensor
@@ -86,15 +87,22 @@ lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensor
 void screen() {
 	while (true) {
         lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
-		printf("%.3f,%.3f,%.3f\n", pose.x,pose.y,pose.theta);
-        pros::delay(10);
+        pros::lcd::print(0, "x: %f", pose.x); // print the x position
+        pros::lcd::print(1, "y: %f", pose.y); // print the y position
+        pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
+		
+		
+		master.print(0, 0, "y: %f", pose.y); // print the x position
+        // master.print(0, 4, "y: %f", pose.y); // print the y position
+        // master.print(0, 9, "heading: %f", pose.theta); // print the heading
+		//master.print(0, 0, "%f", master.get_analog(ANALOG_LEFT_Y));
+		
+        pros::delay(100);
+		pros::lcd::clear_line(0);
+		pros::lcd::clear_line(1);
+		pros::lcd::clear_line(2);
+
     }
-	// while (true) {
-	// 	// pros::lcd::print(0, "arm: %f", arm.get_position());
-	// 	master.print(0, 0, "x: %f", arm.get_position());
-	// 	master.clear_line(0);
-	// 	pros::delay(10);
-	// }
 }
 
 /**
@@ -104,8 +112,12 @@ void screen() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::Task screenTask(screen);
+	pros::lcd::initialize(); // initialize brain screen
+    pros::Task screenTask(screen); // create a task to print the position to the screen
+    chassis.calibrate(); // calibrate the chassis
+	chassis.setPose(0,0,0);
+	
+
 }
 
 /**
@@ -138,13 +150,6 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	imu.reset();
-	chassis.calibrate();
-	chassis.setPose(0, 0, 0);
-	while(imu.is_calibrating()) {
-		pros::delay(10);
-	}
-	chassis.moveTo(0, 10, 1000, 50, false);
 	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 	// arm.set_zero_position(arm.get_position());
 
@@ -230,6 +235,11 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	//comment this out when not testing
+	// imu.reset();
+	// while(imu.is_calibrating()) {
+	// 	pros::delay(10);
+	// }
 
 	double drive, turn;
 	bool wingToggle = false;
