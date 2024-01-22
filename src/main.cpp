@@ -19,7 +19,7 @@ pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
 pros::Motor			arm(8, MOTOR_GEAR_GREEN, false);
 pros::ADIDigitalOut	wings('A', false);
-pros::Imu			imu(13);
+pros::Imu			imu(18);
 pros::Rotation 		xTracking(7, true);
 
 
@@ -56,7 +56,7 @@ lemlib::OdomSensors_t sensors {
     &right_tracking_wheel, // vertical tracking wheel 2
     &x_tracking_wheel, // horizontal tracking wheel 1
     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
-    nullptr // inertial sensor
+    &imu // inertial sensor
 };
 // forward/backward PID
 lemlib::ChassisController_t lateralController {
@@ -84,19 +84,19 @@ lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensor
 
 
 void screen() {
-	// while (true) {
-    //     lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
-    //     pros::lcd::print(0, "x: %f", pose.x); // print the x position
-    //     pros::lcd::print(1, "y: %f", pose.y); // print the y position
-    //     pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
-    //     pros::delay(10);
-    // }
 	while (true) {
-		// pros::lcd::print(0, "arm: %f", arm.get_position());
-		master.print(0, 0, "arm: %f", arm.get_position());
-		master.clear_line(0);
-		pros::delay(10);
-	}
+        lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
+        master.print(0, 0, "x: %f", pose.x); // print the x position
+        master.print(1, 0, "y: %f", pose.y); // print the y position
+        master.print(2, 0, "heading: %f", pose.theta); // print the heading
+        pros::delay(10);
+    }
+	// while (true) {
+	// 	// pros::lcd::print(0, "arm: %f", arm.get_position());
+	// 	master.print(0, 0, "x: %f", arm.get_position());
+	// 	master.clear_line(0);
+	// 	pros::delay(10);
+	// }
 }
 
 /**
@@ -140,65 +140,75 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	// chassis.calibrate();
-	// chassis.setPose(0, 0, 0);
-	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+	
+	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+	// arm.set_zero_position(arm.get_position());
 
-	arm.move_voltage(6000);
-	while(arm.get_position() < 1500) {
-		pros::delay(10);
-	}
-	arm.move_voltage(0);
+	// arm.move_voltage(6000);
+	// while(arm.get_position() < 1500) {
+	// 	pros::delay(10);
+	// }
+	// arm.move_voltage(0);
 
-	arm.move_voltage(-6000);
-	while(arm.get_position() > 100) {
-		pros::delay(10);
-	}
-	arm.move_voltage(0);
+	// arm.move_voltage(-6000);
+	// while(arm.get_position() > 100) {
+	// 	pros::delay(10);
+	// }
+	// arm.move_voltage(0);
 
-	left_drive.move_voltage(-6000);
-	right_drive.move_voltage(-6000);
-	pros::delay(2000);
-	left_drive.move_voltage(6000);
-	right_drive.move_voltage(6000);
-	pros::delay(4000);
-	left_drive.move_voltage(0);
-	right_drive.move_voltage(0);
+	// left_drive.move_voltage(-6000);
+	// right_drive.move_voltage(-6000);
+	// pros::delay(2000);
+	// left_drive.move_voltage(6000);
+	// right_drive.move_voltage(6000);
+	// pros::delay(4000);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
 
 
-	arm.move_voltage(6000);
-	while(arm.get_position() < 1300) {
-		pros::delay(10);
-	}
-	arm.move_voltage(600);
+	// arm.move_voltage(6000);
+	// while(arm.get_position() < 1300) {
+	// 	pros::delay(10);
+	// }
+	// arm.move_voltage(600);
 
-	flyWheel.move_voltage(11000);
+	// flyWheel.move_voltage(11000);
+
+	// pros::delay(20000);
+
+	// arm.move_voltage(6000);
+	// while(arm.get_position() < 1300) {
+	// 	pros::delay(10);
+	// }
+	// arm.move_voltage(600);
 
 	// chassis.turnTo(30, 0, 10);
 	// chassis.moveTo(-12, 24, 5);
 
 	//dont do this until u tune pid or else
-	//chassis.follow("start.txt", 2000, 15, false);
-	// arm.move_voltage(6000);
-	// while(arm.get_position() < 3000){
-	// 	pros::delay(10);
-	// }
-	// arm.move_voltage(-1000);
-	// flyWheel.move_voltage(11000);
-	// pros::delay(30000);
-	// flyWheel.move_voltage(0);
-	// arm.move_absolute(0, -50);
-	// while(arm.get_position() > 0){
-	// 	pros::delay(10);
-	// }  
-	// chassis.follow("afterShooting.txt", 10000, 15, true);
-	// wings.set_value(true);
-	// chassis.follow("wingsOut1.txt", 5000, 15, false);
-	// wings.set_value(false);
-	// chassis.follow("wingsIn1.txt", 5000, 15, false);
-	// wings.set_value(true);
-	// chassis.follow("wingsOut2.txt", 5000, 15, false);
-	// wings.set_value(false);
+	chassis.calibrate();
+	chassis.setPose(0, 0, 0);
+	chassis.follow("start.txt", 2000, 15, false);
+	arm.move_voltage(6000);
+	while(arm.get_position() < 3000){
+		pros::delay(10);
+	}
+	arm.move_voltage(-1000);
+	flyWheel.move_voltage(11000);
+	pros::delay(30000);
+	flyWheel.move_voltage(0);
+	arm.move_absolute(0, -50);
+	while(arm.get_position() > 0){
+		pros::delay(10);
+	}  
+	chassis.follow("afterShooting.txt", 10000, 15, true);
+	wings.set_value(true);
+	chassis.follow("wingsOut1.txt", 5000, 15, false);
+	wings.set_value(false);
+	chassis.follow("wingsIn1.txt", 5000, 15, false);
+	wings.set_value(true);
+	chassis.follow("wingsOut2.txt", 5000, 15, false);
+	wings.set_value(false);
 
 }
 
