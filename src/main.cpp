@@ -54,11 +54,11 @@ lemlib::TrackingWheel x_tracking_wheel(
 lemlib::OdomSensors_t sensors {
     &left_tracking_wheel, // vertical tracking wheel 1
     &right_tracking_wheel, // vertical tracking wheel 2
-    &x_tracking_wheel, // horizontal tracking wheel 1
+	&x_tracking_wheel, // horizontal tracking wheel 1
     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
     &imu // inertial sensor
 };
-// forward/backward PID
+// forward/backward PID (probably untuned)
 lemlib::ChassisController_t lateralController {
     6.49, // kP
     5, // kD
@@ -86,9 +86,7 @@ lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensor
 void screen() {
 	while (true) {
         lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
-        master.print(0, 0, "x: %f", pose.x); // print the x position
-        master.print(1, 0, "y: %f", pose.y); // print the y position
-        master.print(2, 0, "heading: %f", pose.theta); // print the heading
+		printf("%.3f,%.3f,%.3f\n", pose.x,pose.y,pose.theta);
         pros::delay(10);
     }
 	// while (true) {
@@ -140,7 +138,13 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	
+	imu.reset();
+	chassis.calibrate();
+	chassis.setPose(0, 0, 0);
+	while(imu.is_calibrating()) {
+		pros::delay(10);
+	}
+	chassis.moveTo(0, 10, 1000, 50, false);
 	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 	// arm.set_zero_position(arm.get_position());
 
@@ -186,29 +190,29 @@ void autonomous() {
 	// chassis.moveTo(-12, 24, 5);
 
 	//dont do this until u tune pid or else
-	chassis.calibrate();
-	chassis.setPose(0, 0, 0);
-	chassis.follow("start.txt", 2000, 15, false);
-	arm.move_voltage(6000);
-	while(arm.get_position() < 3000){
-		pros::delay(10);
-	}
-	arm.move_voltage(-1000);
-	flyWheel.move_voltage(11000);
-	pros::delay(30000);
-	flyWheel.move_voltage(0);
-	arm.move_absolute(0, -50);
-	while(arm.get_position() > 0){
-		pros::delay(10);
-	}  
-	chassis.follow("afterShooting.txt", 10000, 15, true);
-	wings.set_value(true);
-	chassis.follow("wingsOut1.txt", 5000, 15, false);
-	wings.set_value(false);
-	chassis.follow("wingsIn1.txt", 5000, 15, false);
-	wings.set_value(true);
-	chassis.follow("wingsOut2.txt", 5000, 15, false);
-	wings.set_value(false);
+	// chassis.calibrate();
+	// chassis.setPose(0, 0, 0);
+	// chassis.follow("start.txt", 2000, 15, false);
+	// arm.move_voltage(6000);
+	// while(arm.get_position() < 3000){
+	// 	pros::delay(10);
+	// }
+	// arm.move_voltage(-1000);
+	// flyWheel.move_voltage(11000);
+	// pros::delay(30000);
+	// flyWheel.move_voltage(0);
+	// arm.move_absolute(0, -50);
+	// while(arm.get_position() > 0){
+	// 	pros::delay(10);
+	// }  
+	// chassis.follow("afterShooting.txt", 10000, 15, true);
+	// wings.set_value(true);
+	// chassis.follow("wingsOut1.txt", 5000, 15, false);
+	// wings.set_value(false);
+	// chassis.follow("wingsIn1.txt", 5000, 15, false);
+	// wings.set_value(true);
+	// chassis.follow("wingsOut2.txt", 5000, 15, false);
+	// wings.set_value(false);
 
 }
 
