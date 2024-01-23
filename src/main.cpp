@@ -7,6 +7,7 @@ pros::Controller	master(pros::E_CONTROLLER_MASTER);
 // 18:1, 200 RPM, Green gear set
 // 6:1, 600 RPM, Blue gear set
 
+//set up drive motors
 pros::Motor			left_front(1, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_mid(3, MOTOR_GEAR_BLUE, true);
 pros::Motor			left_back(2, MOTOR_GEAR_BLUE, true);
@@ -16,6 +17,7 @@ pros::Motor			right_back(17,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
 
+//set up other stuff
 pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
 pros::Motor			arm(8, MOTOR_GEAR_GREEN, false);
@@ -23,7 +25,7 @@ pros::ADIDigitalOut	wings('A', false);
 pros::Imu			imu(18);
 pros::Rotation 		xTracking(7, true);
 
-
+//lem lib :)
 lemlib::Drivetrain_t drivetrain {
     &left_drive, // left drivetrain motors
     &right_drive, // right drivetrain motors
@@ -85,22 +87,25 @@ lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensor
 
 
 void screen() {
+	master.clear();
 	while (true) {
         lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
-        pros::lcd::print(0, "x: %f", pose.x); // print the x position
-        pros::lcd::print(1, "y: %f", pose.y); // print the y position
-        pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
-		
-		
-		master.print(0, 0, "y: %f", pose.y); // print the x position
-        // master.print(0, 4, "y: %f", pose.y); // print the y position
-        // master.print(0, 9, "heading: %f", pose.theta); // print the heading
+        // pros::lcd::print(0, "x: %f", pose.x); // print the x position
+		// pros::delay(50);
+        // pros::lcd::print(1, "y: %f", pose.y); // print the y position
+		// pros::delay(50);
+        // pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
+		// pros::delay(50);
+
+		master.print(0, 0, "x: %f", pose.x); // print the x position
+		pros::delay(50);
+        master.print(1, 0, "y: %f", pose.y); // print the y position
+		pros::delay(50);
+        master.print(2, 0, "heading: %f", pose.theta); // print the heading
+		pros::delay(50);
 		//master.print(0, 0, "%f", master.get_analog(ANALOG_LEFT_Y));
+
 		
-        pros::delay(100);
-		pros::lcd::clear_line(0);
-		pros::lcd::clear_line(1);
-		pros::lcd::clear_line(2);
 
     }
 }
@@ -114,10 +119,7 @@ void screen() {
 void initialize() {
 	pros::lcd::initialize(); // initialize brain screen
     pros::Task screenTask(screen); // create a task to print the position to the screen
-    chassis.calibrate(); // calibrate the chassis
-	chassis.setPose(0,0,0);
 	
-
 }
 
 /**
@@ -150,6 +152,12 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+	chassis.calibrate();
+	chassis.setPose(0, 0, 0); // set this to specific points on the field when we're not tuning
+	while(imu.is_calibrating()) {
+		pros::delay(20);
+	}
+	
 	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 	// arm.set_zero_position(arm.get_position());
 
@@ -235,11 +243,12 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	//comment this out when not testing
-	// imu.reset();
-	// while(imu.is_calibrating()) {
-	// 	pros::delay(10);
-	// }
+	//remove this when not testing
+	chassis.calibrate();
+	chassis.setPose(0, 0, 0); // set this to specific points on the field when we're not tuning
+	while(imu.is_calibrating()) {
+		pros::delay(20);
+	}
 
 	double drive, turn;
 	bool wingToggle = false;
@@ -256,9 +265,7 @@ void opcontrol() {
 
 		
 
-		// set button bindings and velocity of the intake. we multiply the percent by 2 because its a green motor,
-		// 		and move_velocity() reads in +/- 200 for green motors. also we want to make code easier to read
-		//		if u want to change the percent speed that the motor moves, change the number being mutiplied by 2
+		// set button bindings and velocity of the intake
 		if(master.get_digital(DIGITAL_R2)) {
 			intake.move_voltage(12000);
 		} else if (master.get_digital(DIGITAL_R1)) {
@@ -267,7 +274,7 @@ void opcontrol() {
 			intake.move_velocity(0);
 		}
 
-		// set button bindings and velocity of arm. again multiply by 2
+		// set button bindings and velocity of arm
 		if(master.get_digital(DIGITAL_UP)) {
 			arm.move_voltage(6000);
 		} else if(master.get_digital(DIGITAL_DOWN)) {
@@ -278,6 +285,7 @@ void opcontrol() {
 
 		// toggles pneumatics for wings
 		// wont work if its anything else idk why
+		// tried wingToggle != wingToggle and ^=, neither worked so we do this
 		if(master.get_digital_new_press(DIGITAL_A)) {
 			if(wingToggle == false) {
 				wings.set_value(true);
@@ -288,8 +296,7 @@ void opcontrol() {
 			}
 		}
 
-		// shooter :)
-		// multiply pct speed by 6 bc its a blue motor
+		// flywheel :)
 		if(master.get_digital(DIGITAL_L2)) {
 			flyWheel.move_voltage(11000);
 		} else if (master.get_digital(DIGITAL_L1)) {
