@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp"
+#include "PID.cpp"
 
 pros::Controller	master(pros::E_CONTROLLER_MASTER);
 
@@ -17,6 +18,8 @@ pros::Motor			right_back(17,  MOTOR_GEAR_BLUE, false);
 pros::Motor_Group	left_drive({left_front, left_mid, left_back});
 pros::Motor_Group	right_drive({right_front, right_mid, right_back});
 
+
+
 //set up other stuff
 pros::Motor			flyWheel(10, MOTOR_GEAR_BLUE, false);
 pros::Motor			intake(9, MOTOR_GEAR_GREEN, false);
@@ -25,90 +28,102 @@ pros::ADIDigitalOut	wings('A', false);
 pros::Imu			imu(18);
 pros::Rotation 		xTracking(7, true);
 
-//lem lib :)
-lemlib::Drivetrain_t drivetrain {
-    &left_drive, // left drivetrain motors
-    &right_drive, // right drivetrain motors
-    12.4375, // track width
-    3.25, // wheel diameter
-    360 // wheel rpm
+
+class Arm : public pros::Motor {
+	PID armPID;
+
+	public:
+		Arm(const std::int8_t port, const pros::motor_gearset_e gearset, const bool reverse) : pros::Motor(port, gearset, reverse) {
+
+		}
+
+		void setPID(double p, double i, double d, double setpoint) {
+			armPID.setValues(p, i, d, setpoint);
+		}
+
+		void stay(double degree) {
+		}
+
+
 };
 
-lemlib::TrackingWheel left_tracking_wheels(
-	&left_drive, // encoder
-	3.25, // " wheel diameter
-	-12.4375/2.0, // " offset from tracking center
-	1 // gear ratio
-);
+void matchLoad(int degrees, double millivolts, double seconds) { 
+	int wantTime = seconds * 1000 + pros::millis();
+	while ( pros::millis() < wantTime ) {
+		flyWheel.move_voltage(millivolts);
+		arm.move_absolute(degrees, 300);
+	}
+};
 
-lemlib::TrackingWheel right_tracking_wheels(
-	&right_drive, // encoder
-	3.25, // " wheel diameter
-	12.4375/2.0, // " offset from tracking center
-	1 // gear ratio
-);
+
+//lem lib :)
+lemlib::Drivetrain drivetrain {
+	&left_drive, // left motor group
+	&right_drive, // right motor group
+	12.6875, // 10 inch track width
+	lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
+	360, // drivetrain rpm is 360
+	2 // chase power is 2. If we had traction wheels, it would have been 8
+};
+
+// lemlib::TrackingWheel left_tracking_wheels(
+// 	&left_drive, // encoder
+// 	3.25, // " wheel diameter
+// 	-12.4375/2.0, // " offset from tracking center
+// 	1 // gear ratio
+// );
+
+// lemlib::TrackingWheel right_tracking_wheels(
+// 	&right_drive, // encoder
+// 	3.25, // " wheel diameter
+// 	12.4375/2.0, // " offset from tracking center
+// 	1 // gear ratio
+// );
 
 lemlib::TrackingWheel x_tracking_wheel(
 	&xTracking, // encoder
-	3.25, // " wheel diameter
-	-4.5, // " offset from tracking center
-	1 // gear ratio
+	lemlib::Omniwheel::NEW_325, // " wheel diameter
+	-4.7 // " offset from tracking center
 );
-lemlib::OdomSensors_t sensors {
-    nullptr, // vertical tracking wheel 1
+
+lemlib::OdomSensors sensors {
+	nullptr, // vertical tracking wheel 1
 	nullptr, // vertical tracking wheel 2
 	&x_tracking_wheel, // horizontal tracking wheel 1
     nullptr, // we don't have a second tracking wheel, so we set it to nullptr
     &imu // inertial sensor
 };
-// forward/backward PID (probably untuned)
-lemlib::ChassisController_t lateralController {
-    6.49, // kP
-    5, // kD
-    1, // smallErrorRange
-    100, // smallErrorTimeout
-    3, // largeErrorRange
-    500, // largeErrorTimeout
-    3 // slew rate
+
+// forward/backward PID (probably tuned)
+lemlib::ControllerSettings lateralController {
+	9.7, // proportional gain (kP)
+	0, // integral gain (kI)
+	5, // derivative gain (kD)
+	3, // anti windup
+	1, // small error range, in inches
+	100, // small error range timeout, in milliseconds
+	3, // large error range, in inches
+	500, // large error range timeout, in milliseconds
+	20 // maximum acceleration (slew)
 };
-// turning PID (untuned)
-lemlib::ChassisController_t angularController {
-    0, // kP
-    0, // kD
-    1, // smallErrorRange
-    100, // smallErrorTimeout
-    3, // largeErrorRange
-    500, // largeErrorTimeout
-	1 // slew rate
+
+// turning PID (probably tuned)
+lemlib::ControllerSettings angularController {
+	2.1, // proportional gain (kP)
+	0, // integral gain (kI)
+	0, // derivative gain (kD)
+	3, // anti windup
+	1, // small error range, in degrees
+	100, // small error range timeout, in milliseconds
+	3, // large error range, in degrees
+	500, // large error range timeout, in milliseconds
+	1 // maximum acceleration (slew)
 };
+
 lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
 
 
-
-void screen() {
-	master.clear();
-	while (true) {
-        lemlib::Pose pose = chassis.getPose(); // get the current position of the robot
-        // pros::lcd::print(0, "x: %f", pose.x); // print the x position
-		// pros::delay(50);
-        // pros::lcd::print(1, "y: %f", pose.y); // print the y position
-		// pros::delay(50);
-        // pros::lcd::print(2, "heading: %f", pose.theta); // print the heading
-		// pros::delay(50);
-
-		master.print(0, 0, "x: %f", pose.x); // print the x position
-		pros::delay(50);
-        master.print(1, 0, "y: %f", pose.y); // print the y position
-		pros::delay(50);
-        master.print(2, 0, "heading: %f", pose.theta); // print the heading
-		pros::delay(50);
-		//master.print(0, 0, "%f", master.get_analog(ANALOG_LEFT_Y));
-
-		
-
-    }
-}
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -118,8 +133,24 @@ void screen() {
  */
 void initialize() {
 	pros::lcd::initialize(); // initialize brain screen
-    pros::Task screenTask(screen); // create a task to print the position to the screen
-	
+	chassis.calibrate();
+	while(imu.is_calibrating()) {
+		pros::delay(20);
+	}
+
+	pros::Task screenTask([&]() {
+        lemlib::Pose pose(0, 0, 0);
+        while (true) {
+            // print robot location to the brain screen
+            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // log position telemetry
+            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            // delay to save resources
+            pros::delay(50);
+        }
+    });
 }
 
 /**
@@ -153,14 +184,18 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.calibrate();
-	chassis.setPose(0, 0, 0); // set this to specific points on the field when we're not tuning
 	while(imu.is_calibrating()) {
 		pros::delay(20);
 	}
-	
-	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
-	// arm.set_zero_position(arm.get_position());
+	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+	arm.set_zero_position(arm.get_position());
 
+
+
+
+
+
+	// coles hard coded auton that was 1 point away from #1
 	// arm.move_voltage(6000);
 	// while(arm.get_position() < 1500) {
 	// 	pros::delay(10);
@@ -182,52 +217,10 @@ void autonomous() {
 	// left_drive.move_voltage(0);
 	// right_drive.move_voltage(0);
 
-
-	// arm.move_voltage(6000);
-	// while(arm.get_position() < 1300) {
-	// 	pros::delay(10);
-	// }
-	// arm.move_voltage(600);
-
-	// flyWheel.move_voltage(11000);
-
-	// pros::delay(20000);
-
-	// arm.move_voltage(6000);
-	// while(arm.get_position() < 1300) {
-	// 	pros::delay(10);
-	// }
-	// arm.move_voltage(600);
-
-	// chassis.turnTo(30, 0, 10);
-	// chassis.moveTo(-12, 24, 5);
-
-	//dont do this until u tune pid or else
-	// chassis.calibrate();
-	// chassis.setPose(0, 0, 0);
-	// chassis.follow("start.txt", 2000, 15, false);
-	// arm.move_voltage(6000);
-	// while(arm.get_position() < 3000){
-	// 	pros::delay(10);
-	// }
-	// arm.move_voltage(-1000);
-	// flyWheel.move_voltage(11000);
-	// pros::delay(30000);
-	// flyWheel.move_voltage(0);
-	// arm.move_absolute(0, -50);
-	// while(arm.get_position() > 0){
-	// 	pros::delay(10);
-	// }  
-	// chassis.follow("afterShooting.txt", 10000, 15, true);
-	// wings.set_value(true);
-	// chassis.follow("wingsOut1.txt", 5000, 15, false);
-	// wings.set_value(false);
-	// chassis.follow("wingsIn1.txt", 5000, 15, false);
-	// wings.set_value(true);
-	// chassis.follow("wingsOut2.txt", 5000, 15, false);
-	// wings.set_value(false);
+	// matchLoad(1300, -10000, 30000);
 
 }
+
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -243,27 +236,25 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	//remove this when not testing
-	chassis.calibrate();
-	chassis.setPose(0, 0, 0); // set this to specific points on the field when we're not tuning
-	while(imu.is_calibrating()) {
-		pros::delay(20);
-	}
+	// //remove this when not testing
+	// chassis.calibrate();
+	// chassis.setPose(0, 0, 0); // set this to specific points on the field when we're not tuning
+	// while(imu.is_calibrating()) {
+	// 	pros::delay(20);
+	// }
 
 	double drive, turn;
 	bool wingToggle = false;
 	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
-
+ 
 	while (true) {
-		drive = master.get_analog(ANALOG_LEFT_Y);
-		turn = master.get_analog(ANALOG_RIGHT_X) / 2.5 * ((int)(abs(drive)/60)*0.5+1);
+		drive = master.get_analog(ANALOG_LEFT_Y)*1.27;
+		turn = master.get_analog(ANALOG_RIGHT_X)*1.27 / 2.5 * ((int)(abs(drive)/60)*0.5+1);
 
-		// also we change to LemLib driving bc its better pepega, we just have this rn for testing purposes :)
-		// since its a blue motor, we have to multiply the velocity by 6 because pros is weird and asks for the rpm instead of percent speed
-		left_drive.move_velocity((drive + turn)*6);
-		right_drive.move_velocity((drive - turn)*6);
+		// we could do chassis.curvature instead, where the right stick controls the curvature the robot drives with instead of the speed it
+		// turns
+		chassis.arcade(drive, turn, 2.7);
 
-		
 
 		// set button bindings and velocity of the intake
 		if(master.get_digital(DIGITAL_R2)) {
@@ -298,9 +289,9 @@ void opcontrol() {
 
 		// flywheel :)
 		if(master.get_digital(DIGITAL_L2)) {
-			flyWheel.move_voltage(11000);
+			flyWheel.move_voltage(10000);
 		} else if (master.get_digital(DIGITAL_L1)) {
-			flyWheel.move_voltage(-11000);
+			flyWheel.move_voltage(-10000);
 		} else {
 			flyWheel.move_velocity(0);
 		}
