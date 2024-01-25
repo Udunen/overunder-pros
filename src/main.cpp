@@ -31,20 +31,12 @@ pros::Rotation 		xTracking(7, true);
 
 class Arm : public pros::Motor {
 	PID armPID;
-
 	public:
-		Arm(const std::int8_t port, const pros::motor_gearset_e gearset, const bool reverse) : pros::Motor(port, gearset, reverse) {
-
-		}
+		Arm(const std::int8_t port, const pros::motor_gearset_e gearset, const bool reverse) : pros::Motor(port, gearset, reverse) {}
 
 		void setPID(double p, double i, double d, double setpoint) {
 			armPID.setValues(p, i, d, setpoint);
 		}
-
-		void stay(double degree) {
-		}
-
-
 };
 
 void matchLoad(int degrees, double millivolts, double seconds) { 
@@ -53,6 +45,9 @@ void matchLoad(int degrees, double millivolts, double seconds) {
 		flyWheel.move_voltage(millivolts);
 		arm.move_absolute(degrees, 300);
 	}
+	flyWheel.move_voltage(0);
+	arm.move_absolute(200, 300);
+	
 };
 
 
@@ -60,7 +55,7 @@ void matchLoad(int degrees, double millivolts, double seconds) {
 lemlib::Drivetrain drivetrain {
 	&left_drive, // left motor group
 	&right_drive, // right motor group
-	12.6875, // 10 inch track width
+	12.5625, // " track width
 	lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
 	360, // drivetrain rpm is 360
 	2 // chase power is 2. If we had traction wheels, it would have been 8
@@ -83,7 +78,7 @@ lemlib::Drivetrain drivetrain {
 lemlib::TrackingWheel x_tracking_wheel(
 	&xTracking, // encoder
 	lemlib::Omniwheel::NEW_325, // " wheel diameter
-	-4.7 // " offset from tracking center
+	3.95 // " offset from tracking center
 );
 
 lemlib::OdomSensors sensors {
@@ -104,7 +99,7 @@ lemlib::ControllerSettings lateralController {
 	100, // small error range timeout, in milliseconds
 	3, // large error range, in inches
 	500, // large error range timeout, in milliseconds
-	20 // maximum acceleration (slew)
+	10 // maximum acceleration (slew)
 };
 
 // turning PID (probably tuned)
@@ -137,14 +132,20 @@ void initialize() {
 	while(imu.is_calibrating()) {
 		pros::delay(20);
 	}
-
+	master.clear();
 	pros::Task screenTask([&]() {
         lemlib::Pose pose(0, 0, 0);
         while (true) {
+			
             // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            // pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            // pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+			master.print(0, 0, "x: %f", chassis.getPose().x);
+			pros::delay(50);
+			master.print(1, 0, "y: %f", chassis.getPose().y);
+			pros::delay(50);
+			master.print(2, 0, "theta: %f", chassis.getPose().theta);
             // log position telemetry
             lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
             // delay to save resources
@@ -182,44 +183,56 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
+ASSET(test2_txt);
+ASSET(test3_txt);
+ASSET(test4_txt);
+ASSET(test5_txt);
+ASSET(test6_txt);
 void autonomous() {
-	chassis.calibrate();
-	while(imu.is_calibrating()) {
-		pros::delay(20);
-	}
+	// chassis.calibrate();
+	// while(imu.is_calibrating()) {
+	// 	pros::delay(20);
+	// }
 	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 	arm.set_zero_position(arm.get_position());
 
 
+	left_drive.move_voltage(-12000);
+	right_drive.move_voltage(-3000);
+	pros::delay(1000);
+	left_drive.move_voltage(0);
+	right_drive.move_voltage(0);
+	matchLoad(1500, -10000, 30);
 
 
 
+	chassis.setPose(-43.602, -60.143, 45);
 
-	// coles hard coded auton that was 1 point away from #1
-	// arm.move_voltage(6000);
-	// while(arm.get_position() < 1500) {
-	// 	pros::delay(10);
-	// }
-	// arm.move_voltage(0);
+	left_drive.move_voltage(7000);
+	right_drive.move_voltage(1000);
+	pros::delay(300);
+	left_drive.move_voltage(0);
+	right_drive.move_voltage(0);
 
-	// arm.move_voltage(-6000);
-	// while(arm.get_position() > 100) {
-	// 	pros::delay(10);
-	// }
-	// arm.move_voltage(0);
 
-	// left_drive.move_voltage(-6000);
-	// right_drive.move_voltage(-6000);
-	// pros::delay(2000);
-	// left_drive.move_voltage(6000);
-	// right_drive.move_voltage(6000);
-	// pros::delay(4000);
-	// left_drive.move_voltage(0);
-	// right_drive.move_voltage(0);
-
-	// matchLoad(1300, -10000, 30000);
-
+	chassis.turnTo(-37.788, -58, 2000, false, 75);
+	chassis.moveToPoint(-37.788, -59.937, 10000, false);
+	
+	chassis.follow(test2_txt, 8, 13000, false);
+	
+	chassis.follow(test3_txt, 8, 10000, true);
+	chassis.turnTo(12, -30, 50, 2000, false);
+	wings.set_value(true);
+	chassis.follow(test4_txt, 11, 10000, false);
+	wings.set_value(false);
+	chassis.follow(test5_txt, 11, 10000, true);
+	wings.set_value(true);
+	chassis.follow(test6_txt, 11, 10000, false);
+	wings.set_value(false);
 }
+
+
+
 
 
 /**
@@ -248,12 +261,15 @@ void opcontrol() {
 	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
  
 	while (true) {
-		drive = master.get_analog(ANALOG_LEFT_Y)*1.27;
-		turn = master.get_analog(ANALOG_RIGHT_X)*1.27 / 2.5 * ((int)(abs(drive)/60)*0.5+1);
+		drive = master.get_analog(ANALOG_LEFT_Y);
+		turn = master.get_analog(ANALOG_RIGHT_X) / 2.5 * ((int)(abs(drive)/60)*0.5+1);
 
-		// we could do chassis.curvature instead, where the right stick controls the curvature the robot drives with instead of the speed it
-		// turns
-		chassis.arcade(drive, turn, 2.7);
+		// we could do chassis.curvature instead, where the right stick 
+		// controls the curvature the robot drives with instead of the speed it turns
+		// chassis.arcade(drive, turn);
+		// chassis.curvature(drive, turn, 2.7);
+		left_drive.move_velocity((drive + turn)*6);
+		right_drive.move_velocity((drive - turn)*6);	
 
 
 		// set button bindings and velocity of the intake
