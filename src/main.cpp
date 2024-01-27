@@ -29,16 +29,6 @@ pros::Imu			imu(18);
 pros::Rotation 		xTracking(7, true);
 
 
-class Arm : public pros::Motor {
-	PID armPID;
-	public:
-		Arm(const std::int8_t port, const pros::motor_gearset_e gearset, const bool reverse) : pros::Motor(port, gearset, reverse) {}
-
-		void setPID(double p, double i, double d, double setpoint) {
-			armPID.setValues(p, i, d, setpoint);
-		}
-};
-
 void matchLoad(int degrees, double millivolts, double seconds) { 
 	int wantTime = seconds * 1000 + pros::millis();
 	while ( pros::millis() < wantTime ) {
@@ -46,9 +36,13 @@ void matchLoad(int degrees, double millivolts, double seconds) {
 		arm.move_absolute(degrees, 300);
 	}
 	flyWheel.move_voltage(0);
-	arm.move_absolute(200, 300);
-	
+	arm.move_absolute(200, 300);	
 };
+
+void matchLoad(int degrees, double speed) {
+	flyWheel.move_velocity(speed);
+	arm.move_absolute(degrees, 300);
+}
 
 
 //lem lib :)
@@ -202,7 +196,7 @@ void autonomous() {
 	pros::delay(1000);
 	left_drive.move_voltage(0);
 	right_drive.move_voltage(0);
-	matchLoad(1500, -10000, 30);
+	matchLoad(1500, -9000, 30);
 
 
 
@@ -215,7 +209,7 @@ void autonomous() {
 	right_drive.move_voltage(0);
 
 
-	chassis.turnTo(-37.788, -58, 2000, false, 75);
+	chassis.turnTo(-37.788, -60, 2000, false, 75);
 	chassis.moveToPoint(-37.788, -59.937, 10000, false);
 	
 	chassis.follow(test2_txt, 8, 13000, false);
@@ -223,11 +217,11 @@ void autonomous() {
 	chassis.follow(test3_txt, 8, 10000, true);
 	chassis.turnTo(12, -30, 50, 2000, false);
 	wings.set_value(true);
-	chassis.follow(test4_txt, 11, 10000, false);
+	chassis.follow(test4_txt, 9, 10000, false);
 	wings.set_value(false);
-	chassis.follow(test5_txt, 11, 10000, true);
+	chassis.follow(test5_txt, 9, 10000, true);
 	wings.set_value(true);
-	chassis.follow(test6_txt, 11, 10000, false);
+	chassis.follow(test6_txt, 9, 10000, false);
 	wings.set_value(false);
 }
 
@@ -271,7 +265,7 @@ void opcontrol() {
 		left_drive.move_velocity((drive + turn)*6);
 		right_drive.move_velocity((drive - turn)*6);	
 
-
+		
 		// set button bindings and velocity of the intake
 		if(master.get_digital(DIGITAL_R2)) {
 			intake.move_voltage(12000);
@@ -286,6 +280,8 @@ void opcontrol() {
 			arm.move_voltage(6000);
 		} else if(master.get_digital(DIGITAL_DOWN)) {
 			arm.move_voltage(-6000);
+		} else if (master.get_digital(DIGITAL_Y) ) {
+			arm.move_absolute(800, 300);
 		} else {
 			arm.move_velocity(0);
 		}
@@ -305,11 +301,13 @@ void opcontrol() {
 
 		// flywheel :)
 		if(master.get_digital(DIGITAL_L2)) {
-			flyWheel.move_voltage(10000);
+			flyWheel.move_velocity(350);
 		} else if (master.get_digital(DIGITAL_L1)) {
-			flyWheel.move_voltage(-10000);
+			flyWheel.move_velocity(-350);
 		} else {
 			flyWheel.move_velocity(0);
 		}
+
+		
 	}
 }
