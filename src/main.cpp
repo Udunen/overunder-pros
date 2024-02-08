@@ -126,26 +126,29 @@ void initialize() {
 	while(imu.is_calibrating()) {
 		pros::delay(20);
 	}
-	master.clear();
-	pros::Task screenTask([&]() {
-        lemlib::Pose pose(0, 0, 0);
-        while (true) {
+	// master.clear();
+	// pros::Task screenTask([&]() {
+    //     lemlib::Pose pose(0, 0, 0);
+    //     while (true) {
 			
-            // print robot location to the brain screen
-            // pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            // pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            // pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-			master.print(0, 0, "x: %f", chassis.getPose().x);
-			pros::delay(50);
-			master.print(1, 0, "y: %f", chassis.getPose().y);
-			pros::delay(50);
-			master.print(2, 0, "theta: %f", chassis.getPose().theta);
-            // log position telemetry
-            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-            // delay to save resources
-            pros::delay(50);
-        }
-    });
+    //         // print robot location to the brain screen
+    //         // pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+    //         // pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+    //         // pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+	// 		master.print(0, 0, "x: %f", chassis.getPose().x);
+	// 		pros::delay(50);
+	// 		master.print(1, 0, "y: %f", chassis.getPose().y);
+	// 		pros::delay(50);
+	// 		master.print(2, 0, "theta: %f", chassis.getPose().theta);
+    //         // log position telemetry
+    //         lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+    //         // delay to save resources
+    //         pros::delay(50);
+    //     }
+    // });
+	left_drive.set_brake_modes(MOTOR_BRAKE_BRAKE);
+	right_drive.set_brake_modes(MOTOR_BRAKE_BRAKE);
+
 }
 
 /**
@@ -305,6 +308,12 @@ void opcontrol() {
 		} else if (master.get_digital(DIGITAL_L1)) {
 			flyWheel.move_velocity(-350);
 		} else {
+			flyWheel.move_velocity(0);
+		}
+
+		if(master.get_digital_new_press(DIGITAL_LEFT)) {
+			flyWheel.move_velocity(-350);
+			pros::delay(35000);
 			flyWheel.move_velocity(0);
 		}
 
