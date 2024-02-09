@@ -262,6 +262,7 @@ void autonomous() {
 	chassis.turnTo(100, 8, 1000, false, 127, false);
 	chassis.moveToPoint(49, 8, 1000, false, 127, false);
 
+
 	//
 	// // push into goal side
 	// chassis.turnTo(53, -48, 1000, false, 90, false);
@@ -347,6 +348,7 @@ void opcontrol() {
 	double drive, turn;
 	bool wingToggle = false;
 	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+	arm.set_zero_position(arm.get_position());
  
 	while (true) {
 		drive = master.get_analog(ANALOG_LEFT_Y);
@@ -404,8 +406,30 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_LEFT)) {
 			flyWheel.move_velocity(-350);
-			pros::delay(35000);
+			pros::delay(25000);
 			flyWheel.move_velocity(0);
+		}
+
+		if(master.get_digital_new_press(DIGITAL_RIGHT) && master.get_digital_new_press(DIGITAL_R1) && master.get_digital_new_press(DIGITAL_R2)) {
+			arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+			arm.set_zero_position(arm.get_position());
+
+			chassis.setPose(-37.484, -56.18, 90);
+			// go to matchload position
+			chassis.turnTo(-58.4, -38.199, 500, false, 127, false);
+			chassis.moveToPoint(-58.4, -38.199, 3500, false, 90, false);
+			chassis.turnTo(100, -40, 500, true, 127, false);
+			wings.set_value(true);
+			matchLoad(800, -9000, 25);
+			wings.set_value(false);
+			chassis.moveToPoint(-54.5, -37.199, 400, true, 127, false);
+			pros::delay(400);
+
+			// go to alley
+			chassis.turnTo(-34.484, -60, 500, false, 90, false);
+			chassis.moveToPoint(-37.484, -60, 5000, false, 80, false);
+			chassis.turnTo(38, -62, 1000, false, 60, false);
+			chassis.moveToPoint(38, -62, 5000, false, 80, false);
 		}
 
 		
