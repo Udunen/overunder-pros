@@ -242,25 +242,25 @@ void autonomous() {
 	chassis.turnTo(46,-46, 2000, true, 90, false);
 	chassis.moveToPoint(52,-42,1500, true, 90, false);
 	wings.set_value(true);
-	chassis.turnTo(34, -34, 1500, false, 60, false);
-	chassis.moveToPoint(34, -34, 5000, false, 127, false);
+	chassis.turnTo(34, -30, 1500, false, 60, false);
+	chassis.moveToPoint(34, -30, 5000, false, 127, false);
 	chassis.turnTo(-100, -30, 1500, false, 60, false);
 	chassis.moveToPoint(20, -30, 5000, false, 127, false);
 	chassis.turnTo(18, 100, 1000, false, 127, false);
 	chassis.moveToPoint(18, -10, 1000, false, 127, false);
-	chassis.turnTo(100, -10, 1000, false, 127, false);
+	chassis.turnTo(100, -14, 1000, false, 127, false);
 	// first push
-	chassis.moveToPoint(44, -10, 1000, false, 127, false);
+	chassis.moveToPoint(47, -14, 1000, false, 127, false);
 	wings.set_value(false);
-	chassis.turnTo(-100, -10, 1000, true, 127, false);
-	chassis.moveToPoint(20, -10, 1000, true, 127, false);
+	chassis.turnTo(-100, -14, 1000, true, 127, false);
+	chassis.moveToPoint(20, -14, 1000, true, 127, false);
 	wings.set_value(true);
 	chassis.turnTo(20, -100, 300, false, 127, false);
 	chassis.turnTo(-100, -10, 300, false, 127, false);
 	chassis.turnTo(18, 100, 1000, false, 127, false);
-	chassis.moveToPoint(18, 10, 3000, false, 127, false);
-	chassis.turnTo(100, 10, 1000, false, 127, false);
-	chassis.moveToPoint(44, 10, 1000, false, 127, false);
+	chassis.moveToPoint(18, 8, 3000, false, 127, false);
+	chassis.turnTo(100, 8, 1000, false, 127, false);
+	chassis.moveToPoint(49, 8, 1000, false, 127, false);
 
 	//
 	// // push into goal side
