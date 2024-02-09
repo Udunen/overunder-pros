@@ -1,4 +1,4 @@
-#include "main.h"
+ #include "main.h"
 #include "lemlib/api.hpp"
 #include "PID.cpp"
 
@@ -180,11 +180,11 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-ASSET(test2_txt);
-ASSET(test3_txt);
-ASSET(test4_txt);
-ASSET(test5_txt);
-ASSET(test6_txt);
+// ASSET(test2_txt);
+// ASSET(test3_txt);
+// ASSET(test4_txt);
+// ASSET(test5_txt);
+// ASSET(test6_txt);
 void autonomous() {
 	// chassis.calibrate();
 	// while(imu.is_calibrating()) {
@@ -193,39 +193,130 @@ void autonomous() {
 	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 	arm.set_zero_position(arm.get_position());
 
+	chassis.setPose(-37.484, -56.18, 90);
+	// go to matchload position
+	chassis.turnTo(-58.4, -38.199, 500, false, 127, false);
+	chassis.moveToPoint(-58.4, -38.199, 3500, false, 90, false);
+	chassis.turnTo(100, -40, 500, true, 127, false);
+	wings.set_value(true);
+	matchLoad(800, -9000, 25);
+	wings.set_value(false);
+	chassis.moveToPoint(-54.5, -37.199, 400, true, 127, false);
+	pros::delay(400);
 
-	left_drive.move_voltage(-12000);
-	right_drive.move_voltage(-3000);
-	pros::delay(1000);
+	// go to alley
+	chassis.turnTo(-34.484, -60, 500, false, 90, false);
+	chassis.moveToPoint(-37.484, -60, 5000, false, 80, false);
+	chassis.turnTo(38, -62, 1000, false, 60, false);
+	chassis.moveToPoint(38, -62, 5000, false, 80, false);
+	wings.set_value(true);
+	chassis.turnTo(47, -58, 1000, false, 60, false);
+	chassis.moveToPoint(47, -58, 5000, false, 80, false);
+	wings.set_value(false);
+	chassis.turnTo(55.5, -49.5, 1000, false, 60, false);
+	chassis.moveToPoint(55.5, -49.5, 5000, false, 80, false);
+	left_drive.move_relative(-1.35, 100);
+	chassis.turnTo(60, 0, 1000, false, 60, false);
+	wings.set_value(true);
+	chassis.moveToPoint(60, -34, 1500, false, 90, false);
+	wings.set_value(false);
+
+	pros::delay(500);
+	chassis.moveToPoint(60, -50, 3000, true, 90, false);
+	left_drive.move_voltage(-11000);
+	right_drive.move_voltage(-11000);
+	pros::delay(500);
 	left_drive.move_voltage(0);
 	right_drive.move_voltage(0);
-	matchLoad(1500, -9000, 30);
-
-
-
-	chassis.setPose(-43.602, -60.143, 45);
-
-	left_drive.move_voltage(7000);
-	right_drive.move_voltage(1000);
 	pros::delay(300);
+
+	chassis.moveToPoint(60, -50, 3000, true, 90, false);
+	left_drive.move_voltage(-11000);
+	right_drive.move_voltage(-11000);
+	pros::delay(500);
 	left_drive.move_voltage(0);
 	right_drive.move_voltage(0);
+	pros::delay(300);
+
+	// push from front	
+	chassis.turnTo(46,-46, 2000, true, 90, false);
+	chassis.moveToPoint(52,-42,1500, true, 90, false);
+	wings.set_value(true);
+	chassis.turnTo(34, -34, 1500, false, 60, false);
+	chassis.moveToPoint(34, -34, 5000, false, 127, false);
+	chassis.turnTo(-100, -30, 1500, false, 60, false);
+	chassis.moveToPoint(20, -30, 5000, false, 127, false);
+	chassis.turnTo(18, 100, 1000, false, 127, false);
+	chassis.moveToPoint(18, -10, 1000, false, 127, false);
+	chassis.turnTo(100, -10, 1000, false, 127, false);
+	// first push
+	chassis.moveToPoint(44, -10, 1000, false, 127, false);
+	wings.set_value(false);
+	chassis.turnTo(-100, -10, 1000, true, 127, false);
+	chassis.moveToPoint(20, -10, 1000, true, 127, false);
+	wings.set_value(true);
+	chassis.turnTo(20, -100, 300, false, 127, false);
+	chassis.turnTo(-100, -10, 300, false, 127, false);
+	chassis.turnTo(18, 100, 1000, false, 127, false);
+	chassis.moveToPoint(18, 10, 3000, false, 127, false);
+	chassis.turnTo(100, 10, 1000, false, 127, false);
+	chassis.moveToPoint(44, 10, 1000, false, 127, false);
+
+	//
+	// // push into goal side
+	// chassis.turnTo(53, -48, 1000, false, 90, false);
+	// chassis.moveToPoint(53, -48, 1000, false, 90, false);
+	// wings.set_value(false);
+	// pros::delay(700);
+	// chassis.turnTo(61, -42, 1000, false, 90, false);
+	// chassis.moveToPoint(61, -42, 4000, false, 90, false);
+	// // chassis.turnTo(59, -39, 1000, false, 90, false);
+	// // chassis.moveToPoint(59, -39, 3000, false, 127, false);
+	// wings.set_value(true);
+	// chassis.turnTo(61, 256, 1000, false, 45, false);
+	// wings.set_value(false);
+	// pros::delay(500);
+	// // // chassis.moveToPoint(60, -33, 1500, false, 127, false);
+	// // //chassis.turnTo(60, 0, 1000, false, 90, false);
+	// left_drive.move_voltage(-12000);
+	// right_drive.move_voltage(-12000);
+	// pros::delay(1000);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
+	// left_drive.move_voltage(12000);
+	// right_drive.move_voltage(12000);
+	// pros::delay(400);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
 
 
-	chassis.turnTo(-37.788, -60, 2000, false, 75);
-	chassis.moveToPoint(-37.788, -59.937, 10000, false);
+	// // push again
+	// // chassis.turnTo(60, -39, 1000, true, 45, false);
+	// // chassis.moveToPoint(60, -39, 3000, true, 45, false);
+	// // chassis.turnTo(60, 0, 1000, false, 45, false);
+	// // chassis.moveToPoint(65, -33, 1500, false, 127, false);
+	// left_drive.move_voltage(-12000);
+	// right_drive.move_voltage(-12000);
+	// pros::delay(1000);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
+
+
+
+	// chassis.turnTo(-37.788, -60, 2000, false, 75);
+	// chassis.moveToPoint(-37.788, -59.937, 10000, false);s
 	
-	chassis.follow(test2_txt, 8, 13000, false);
+	// chassis.follow(test2_txt, 8, 13000, false);
 	
-	chassis.follow(test3_txt, 8, 10000, true);
-	chassis.turnTo(12, -30, 50, 2000, false);
-	wings.set_value(true);
-	chassis.follow(test4_txt, 9, 10000, false);
-	wings.set_value(false);
-	chassis.follow(test5_txt, 9, 10000, true);
-	wings.set_value(true);
-	chassis.follow(test6_txt, 9, 10000, false);
-	wings.set_value(false);
+	// chassis.follow(test3_txt, 8, 10000, true);
+	// chassis.turnTo(12, -30, 50, 2000, false);
+	// wings.set_value(true);
+	// chassis.follow(test4_txt, 9, 10000, false);
+	// wings.set_value(false);
+	// chassis.follow(test5_txt, 9, 10000, true);
+	// wings.set_value(true);
+	// chassis.follow(test6_txt, 9, 10000, false);
+	// wings.set_value(false);
 }
 
 
@@ -304,9 +395,9 @@ void opcontrol() {
 
 		// flywheel :)
 		if(master.get_digital(DIGITAL_L2)) {
-			flyWheel.move_velocity(350);
+			flyWheel.move_velocity(400);
 		} else if (master.get_digital(DIGITAL_L1)) {
-			flyWheel.move_velocity(-350);
+			flyWheel.move_velocity(-400);
 		} else {
 			flyWheel.move_velocity(0);
 		}
