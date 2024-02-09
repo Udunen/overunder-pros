@@ -199,7 +199,7 @@ void autonomous() {
 	chassis.moveToPoint(-58.4, -38.199, 3500, false, 90, false);
 	chassis.turnTo(100, -40, 500, true, 127, false);
 	wings.set_value(true);
-	matchLoad(800, -9000, 3);
+	matchLoad(800, -9000, 25);
 	wings.set_value(false);
 	chassis.moveToPoint(-54.5, -37.199, 400, true, 127, false);
 	pros::delay(400);
@@ -210,46 +210,96 @@ void autonomous() {
 	chassis.turnTo(38, -62, 1000, false, 60, false);
 	chassis.moveToPoint(38, -62, 5000, false, 80, false);
 	wings.set_value(true);
-	chassis.turnTo(44, -56, 1000, false, 60, false);
-	chassis.moveToPoint(44, -56, 5000, false, 80, false);
-
-	// push into goal side
-	chassis.turnTo(53, -48, 1000, false, 90, false);
-	chassis.moveToPoint(53, -48, 1000, false, 90, false);
+	chassis.turnTo(47, -58, 1000, false, 60, false);
+	chassis.moveToPoint(47, -58, 5000, false, 80, false);
 	wings.set_value(false);
-	pros::delay(700);
-	chassis.turnTo(61, -42, 1000, false, 90, false);
-	chassis.moveToPoint(61, -42, 4000, false, 90, false);
-	// chassis.turnTo(59, -39, 1000, false, 90, false);
-	// chassis.moveToPoint(59, -39, 3000, false, 127, false);
+	chassis.turnTo(55.5, -49.5, 1000, false, 60, false);
+	chassis.moveToPoint(55.5, -49.5, 5000, false, 80, false);
+	left_drive.move_relative(-1.35, 100);
+	chassis.turnTo(60, 0, 1000, false, 60, false);
 	wings.set_value(true);
-	chassis.turnTo(61, 256, 1000, false, 45, false);
+	chassis.moveToPoint(60, -34, 1500, false, 90, false);
 	wings.set_value(false);
+
 	pros::delay(500);
-	// // chassis.moveToPoint(60, -33, 1500, false, 127, false);
-	// //chassis.turnTo(60, 0, 1000, false, 90, false);
-	left_drive.move_voltage(-12000);
-	right_drive.move_voltage(-12000);
-	pros::delay(1000);
+	chassis.moveToPoint(60, -50, 3000, true, 90, false);
+	left_drive.move_voltage(-11000);
+	right_drive.move_voltage(-11000);
+	pros::delay(500);
 	left_drive.move_voltage(0);
 	right_drive.move_voltage(0);
-	left_drive.move_voltage(12000);
-	right_drive.move_voltage(12000);
-	pros::delay(400);
+	pros::delay(300);
+
+	chassis.moveToPoint(60, -50, 3000, true, 90, false);
+	left_drive.move_voltage(-11000);
+	right_drive.move_voltage(-11000);
+	pros::delay(500);
 	left_drive.move_voltage(0);
 	right_drive.move_voltage(0);
+	pros::delay(300);
+
+	// push from front	
+	chassis.turnTo(46,-46, 2000, true, 90, false);
+	chassis.moveToPoint(52,-42,1500, true, 90, false);
+	wings.set_value(true);
+	chassis.turnTo(34, -34, 1500, false, 60, false);
+	chassis.moveToPoint(34, -34, 5000, false, 127, false);
+	chassis.turnTo(-100, -30, 1500, false, 60, false);
+	chassis.moveToPoint(20, -30, 5000, false, 127, false);
+	chassis.turnTo(18, 100, 1000, false, 127, false);
+	chassis.moveToPoint(18, -10, 1000, false, 127, false);
+	chassis.turnTo(100, -10, 1000, false, 127, false);
+	// first push
+	chassis.moveToPoint(44, -10, 1000, false, 127, false);
+	wings.set_value(false);
+	chassis.turnTo(-100, -10, 1000, true, 127, false);
+	chassis.moveToPoint(20, -10, 1000, true, 127, false);
+	wings.set_value(true);
+	chassis.turnTo(20, -100, 300, false, 127, false);
+	chassis.turnTo(-100, -10, 300, false, 127, false);
+	chassis.turnTo(18, 100, 1000, false, 127, false);
+	chassis.moveToPoint(18, 10, 3000, false, 127, false);
+	chassis.turnTo(100, 10, 1000, false, 127, false);
+	chassis.moveToPoint(44, 10, 1000, false, 127, false);
+
+	//
+	// // push into goal side
+	// chassis.turnTo(53, -48, 1000, false, 90, false);
+	// chassis.moveToPoint(53, -48, 1000, false, 90, false);
+	// wings.set_value(false);
+	// pros::delay(700);
+	// chassis.turnTo(61, -42, 1000, false, 90, false);
+	// chassis.moveToPoint(61, -42, 4000, false, 90, false);
+	// // chassis.turnTo(59, -39, 1000, false, 90, false);
+	// // chassis.moveToPoint(59, -39, 3000, false, 127, false);
+	// wings.set_value(true);
+	// chassis.turnTo(61, 256, 1000, false, 45, false);
+	// wings.set_value(false);
+	// pros::delay(500);
+	// // // chassis.moveToPoint(60, -33, 1500, false, 127, false);
+	// // //chassis.turnTo(60, 0, 1000, false, 90, false);
+	// left_drive.move_voltage(-12000);
+	// right_drive.move_voltage(-12000);
+	// pros::delay(1000);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
+	// left_drive.move_voltage(12000);
+	// right_drive.move_voltage(12000);
+	// pros::delay(400);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
 
 
-	// push again
-	// chassis.turnTo(60, -39, 1000, true, 45, false);
-	// chassis.moveToPoint(60, -39, 3000, true, 45, false);
-	// chassis.turnTo(60, 0, 1000, false, 45, false);
-	// chassis.moveToPoint(65, -33, 1500, false, 127, false);
-	left_drive.move_voltage(-12000);
-	right_drive.move_voltage(-12000);
-	pros::delay(1000);
-	left_drive.move_voltage(0);
-	right_drive.move_voltage(0);
+	// // push again
+	// // chassis.turnTo(60, -39, 1000, true, 45, false);
+	// // chassis.moveToPoint(60, -39, 3000, true, 45, false);
+	// // chassis.turnTo(60, 0, 1000, false, 45, false);
+	// // chassis.moveToPoint(65, -33, 1500, false, 127, false);
+	// left_drive.move_voltage(-12000);
+	// right_drive.move_voltage(-12000);
+	// pros::delay(1000);
+	// left_drive.move_voltage(0);
+	// right_drive.move_voltage(0);
 
 
 
