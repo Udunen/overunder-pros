@@ -169,23 +169,8 @@ void disabled() {}
  */
 void competition_initialize() {}
 
-/**
- * Runs the user autonomous code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the autonomous
- * mode. Alternatively, this function may be called in initialize or opcontrol
- * for non-competition testing purposes.
- *
- * If the robot is disabled or communications is lost, the autonomous task
- * will be stopped. Re-enabling the robot will restart the task, not re-start it
- * from where it left off.
- */
-// ASSET(test2_txt);
-// ASSET(test3_txt);
-// ASSET(test4_txt);
-// ASSET(test5_txt);
-// ASSET(test6_txt);
-void autonomous() {
+
+void skillsAuton() {
 	// chassis.calibrate();
 	// while(imu.is_calibrating()) {
 	// 	pros::delay(20);
@@ -320,6 +305,120 @@ void autonomous() {
 	// wings.set_value(false);
 }
 
+void vsAuton() {
+	//slot 2 auton
+	//whoop
+	chassis.setPose(38, -55, 0);
+
+	chassis.turnTo(58, -33, 750, true, 60, false);
+	chassis.moveToPoint(58, -33, 3000, true, 80, false);
+	chassis.turnTo(58, 23, 1000, true, 60, false);
+	chassis.moveToPoint(58, -30, 1000, true, 80, false);
+	intake.move_velocity(-12000);
+	pros::delay(500);
+	chassis.moveToPoint(58, -43, 1000, false, 80, false);
+	intake.move_velocity(0);
+	chassis.turnTo(58, -60, 1000, true, 80, false);
+	chassis.moveToPoint(58, -25, 2000, false, 127, false);
+
+
+
+	//slot 3 auton
+	//whoop whoop (includes whoop from above)
+
+	// chassis.moveToPoint(58, -35, 2000, false, 90, false);
+	// chassis.turnTo(38, -55, 2000, false, 60, false);
+	// chassis.moveToPoint(38, -55, 2000, false, 90, false);
+	// chassis.turnTo(-21, -55, 1000, false, 60, false);
+
+	// chassis.moveToPoint(10, -55, 2000, false, 50, false);
+	// arm.move_absolute(24001, 300);
+
+
+
+
+
+	
+	//slot 4 auton
+	//whoop invert
+	// chassis.setPose(-38, -55, 0);
+
+	// chassis.turnTo(-58, -33, 750, true, 60, false);
+	// chassis.moveToPoint(-58, -33, 3000, true, 80, false);
+	// chassis.turnTo(-58, 23, 1000, true, 60, false);
+	// chassis.moveToPoint(-58, -30, 1000, true, 80, false);
+	// intake.move_velocity(-12000);
+	// pros::delay(500);
+	// chassis.moveToPoint(-58, -43, 1000, false, 80, false);
+	// intake.move_velocity(0);
+	// chassis.turnTo(-58, -60, 1000, true, 80, false);
+	// chassis.moveToPoint(-58, -25, 2000, false, 127, false);
+
+
+
+	//slot 5 auton
+	//whoop whoop invert (includes slot 3 auton)
+	// chassis.moveToPoint(-58, -35, 2000, false, 90, false);
+	// chassis.turnTo(-38, -55, 2000, false, 60, false);
+	// chassis.moveToPoint(-38, -55, 2000, false, 90, false);
+	// chassis.turnTo(21, -55, 1000, false, 60, false);
+
+	// chassis.moveToPoint(-10, -55, 2000, false, 50, false);
+	// arm.move_absolute(24001, 300);
+
+	//slot 6 auton
+	//descore no bar
+	// chassis.setPose(-38, -55, 90);
+	// arm.move_absolute(680*4, 300);
+	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+	// flyWheel.move_velocity(12000);
+	// pros::delay(1000);
+	// chassis.turnTo(-70, -70, 1000, false, 50, false);
+	// chassis.moveToPoint(-70, -70, 1000, false, 50, false);
+	// arm.move_absolute(680*5.5, 400);
+	// pros::delay(1000);
+	// flyWheel.move_velocity(0);
+
+	//slot 7 auton
+	//descore with bar (includes slot 6 auton)
+	// arm.move_absolute(680*4-600, 400);
+	// chassis.moveToPoint(-48, -48, 1000, true, 50, false);
+	// chassis.turnTo(-34, -58, 1000, false, 50, false);
+	// chassis.moveToPoint(-34, -58, 1000, false, 50, false);
+	// chassis.turnTo(-0, -58, 1000, false, 50, false);
+	// chassis.moveToPoint(3, -58, 2000, false, 50, false);
+	// arm.move_absolute(680*4, 400);
+
+
+
+	
+
+
+
+
+}
+
+/**
+ * Runs the user autonomous code. This function will be started in its own task
+ * with the default priority and stack size whenever the robot is enabled via
+ * the Field Management System or the VEX Competition Switch in the autonomous
+ * mode. Alternatively, this function may be called in initialize or opcontrol
+ * for non-competition testing purposes.
+ *
+ * If the robot is disabled or communications is lost, the autonomous task
+ * will be stopped. Re-enabling the robot will restart the task, not re-start it
+ * from where it left off.
+ */
+// ASSET(test2_txt);
+// ASSET(test3_txt);
+// ASSET(test4_txt);
+// ASSET(test5_txt);
+// ASSET(test6_txt);
+void autonomous() {
+	//skillsAuton();
+	vsAuton();
+}
+
 
 
 
@@ -375,7 +474,7 @@ void opcontrol() {
 		if(master.get_digital(DIGITAL_UP)) {
 			arm.move_voltage(6000);
 		} else if(master.get_digital(DIGITAL_DOWN)) {
-			arm.move_voltage(-6000);
+			arm.move_voltage(-12000);
 		} else if (master.get_digital(DIGITAL_Y) ) {
 			arm.move_absolute(800, 300);
 		} else {
