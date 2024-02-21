@@ -305,98 +305,121 @@ void skillsAuton() {
 	// wings.set_value(false);
 }
 
-void vsAuton() {
-	//slot 2 auton
-	//whoop
-	chassis.setPose(38, -55, 0);
+// void vsAuton() {
+// 	//slot 2 auton
+// 	//whoop
+// 	chassis.setPose(38, -55, 0);
 
-	chassis.turnTo(58, -33, 750, true, 60, false);
-	chassis.moveToPoint(58, -33, 3000, true, 80, false);
-	chassis.turnTo(58, 23, 1000, true, 60, false);
-	chassis.moveToPoint(58, -30, 1000, true, 80, false);
-	intake.move_velocity(-12000);
-	pros::delay(500);
-	chassis.moveToPoint(58, -43, 1000, false, 80, false);
-	intake.move_velocity(0);
-	chassis.turnTo(58, -60, 1000, true, 80, false);
-	chassis.moveToPoint(58, -25, 2000, false, 127, false);
-
-
-
-	//slot 3 auton
-	//whoop whoop (includes whoop from above)
-
-	// chassis.moveToPoint(58, -35, 2000, false, 90, false);
-	// chassis.turnTo(38, -55, 2000, false, 60, false);
-	// chassis.moveToPoint(38, -55, 2000, false, 90, false);
-	// chassis.turnTo(-21, -55, 1000, false, 60, false);
-
-	// chassis.moveToPoint(10, -55, 2000, false, 50, false);
-	// arm.move_absolute(24001, 300);
+// 	chassis.turnTo(58, -33, 750, true, 60, false);
+// 	chassis.moveToPoint(58, -33, 3000, true, 80, false);
+// 	chassis.turnTo(58, 23, 1000, true, 60, false);
+// 	chassis.moveToPoint(58, -30, 1000, true, 80, false);
+// 	intake.move_velocity(-12000);
+// 	pros::delay(500);
+// 	chassis.moveToPoint(58, -43, 1000, false, 80, false);
+// 	intake.move_velocity(0);
+// 	chassis.turnTo(58, -60, 1000, true, 80, false);
+// 	chassis.moveToPoint(58, -25, 2000, false, 127, false);
 
 
 
+// 	//slot 3 auton
+// 	//whoop whoop (includes whoop from above)
+
+// 	// chassis.moveToPoint(58, -35, 2000, false, 90, false);
+// 	// chassis.turnTo(38, -55, 2000, false, 60, false);
+// 	// chassis.moveToPoint(38, -55, 2000, false, 90, false);
+// 	// chassis.turnTo(-21, -55, 1000, false, 60, false);
+
+// 	// chassis.moveToPoint(10, -55, 2000, false, 50, false);
+// 	// arm.move_absolute(24001, 300);
 
 
-	
-	//slot 4 auton
-	//whoop invert
-	// chassis.setPose(-38, -55, 0);
-
-	// chassis.turnTo(-58, -33, 750, true, 60, false);
-	// chassis.moveToPoint(-58, -33, 3000, true, 80, false);
-	// chassis.turnTo(-58, 23, 1000, true, 60, false);
-	// chassis.moveToPoint(-58, -30, 1000, true, 80, false);
-	// intake.move_velocity(-12000);
-	// pros::delay(500);
-	// chassis.moveToPoint(-58, -43, 1000, false, 80, false);
-	// intake.move_velocity(0);
-	// chassis.turnTo(-58, -60, 1000, true, 80, false);
-	// chassis.moveToPoint(-58, -25, 2000, false, 127, false);
-
-
-
-	//slot 5 auton
-	//whoop whoop invert (includes slot 3 auton)
-	// chassis.moveToPoint(-58, -35, 2000, false, 90, false);
-	// chassis.turnTo(-38, -55, 2000, false, 60, false);
-	// chassis.moveToPoint(-38, -55, 2000, false, 90, false);
-	// chassis.turnTo(21, -55, 1000, false, 60, false);
-
-	// chassis.moveToPoint(-10, -55, 2000, false, 50, false);
-	// arm.move_absolute(24001, 300);
-
-	//slot 6 auton
-	//descore no bar
-	// chassis.setPose(-38, -55, 90);
-	// arm.move_absolute(680*4, 300);
-	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
-	// flyWheel.move_velocity(12000);
-	// pros::delay(1000);
-	// chassis.turnTo(-70, -70, 1000, false, 50, false);
-	// chassis.moveToPoint(-70, -70, 1000, false, 50, false);
-	// arm.move_absolute(680*5.5, 400);
-	// pros::delay(1000);
-	// flyWheel.move_velocity(0);
-
-	//slot 7 auton
-	//descore with bar (includes slot 6 auton)
-	// arm.move_absolute(680*4-600, 400);
-	// chassis.moveToPoint(-48, -48, 1000, true, 50, false);
-	// chassis.turnTo(-34, -58, 1000, false, 50, false);
-	// chassis.moveToPoint(-34, -58, 1000, false, 50, false);
-	// chassis.turnTo(-0, -58, 1000, false, 50, false);
-	// chassis.moveToPoint(3, -58, 2000, false, 50, false);
-	// arm.move_absolute(680*4, 400);
 
 
 
 	
+// 	//slot 4 auton
+// 	//whoop invert
+// 	// chassis.setPose(-38, -55, 0);
+
+// 	// chassis.turnTo(-58, -33, 750, true, 60, false);
+// 	// chassis.moveToPoint(-58, -33, 3000, true, 80, false);
+// 	// chassis.turnTo(-58, 23, 1000, true, 60, false);
+// 	// chassis.moveToPoint(-58, -30, 1000, true, 80, false);
+// 	// intake.move_velocity(-12000);
+// 	// pros::delay(500);
+// 	// chassis.moveToPoint(-58, -43, 1000, false, 80, false);
+// 	// intake.move_velocity(0);
+// 	// chassis.turnTo(-58, -60, 1000, true, 80, false);
+// 	// chassis.moveToPoint(-58, -25, 2000, false, 127, false);
+
+
+
+// 	//slot 5 auton
+// 	//whoop whoop invert (includes slot 3 auton)
+// 	// chassis.moveToPoint(-58, -35, 2000, false, 90, false);
+// 	// chassis.turnTo(-38, -55, 2000, false, 60, false);
+// 	// chassis.moveToPoint(-38, -55, 2000, false, 90, false);
+// 	// chassis.turnTo(21, -55, 1000, false, 60, false);
+
+// 	// chassis.moveToPoint(-10, -55, 2000, false, 50, false);
+// 	// arm.move_absolute(24001, 300);
+
+// 	//slot 6 auton
+// 	//descore no bar
+// 	// chassis.setPose(-38, -55, 90);
+// 	// arm.move_absolute(680*4, 300);
+// 	// arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+// 	// flyWheel.move_velocity(12000);
+// 	// pros::delay(1000);
+// 	// chassis.turnTo(-70, -70, 1000, false, 50, false);
+// 	// chassis.moveToPoint(-70, -70, 1000, false, 50, false);
+// 	// arm.move_absolute(680*5.5, 400);
+// 	// pros::delay(1000);
+// 	// flyWheel.move_velocity(0);
+
+// 	//slot 7 auton
+// 	//descore with bar (includes slot 6 auton)
+// 	// arm.move_absolute(680*4-600, 400);
+// 	// chassis.moveToPoint(-48, -48, 1000, true, 50, false);
+// 	// chassis.turnTo(-34, -58, 1000, false, 50, false);
+// 	// chassis.moveToPoint(-34, -58, 1000, false, 50, false);
+// 	// chassis.turnTo(-0, -58, 1000, false, 50, false);
+// 	// chassis.moveToPoint(3, -58, 2000, false, 50, false);
+// 	// arm.move_absolute(680*4, 400);
+
+
+
+	
 
 
 
 
+// }
+
+
+void soloAutonWinPoint() {
+	chassis.setPose(-45.871, -59.766, 315);
+	chassis.moveToPoint(-55.817, -49.766, 1000, true, 127, false);
+	wings.set_value(true);
+	chassis.moveToPoint(-50.871, -54.766, 1000, false, 127, false);
+	wings.set_value(false);
+	chassis.moveToPoint(-57.871, -47.766, 3000, true, 127, false);
+	chassis.turnTo(-64, 100, 1000, true, 127, false);
+	intake.move_voltage(-12000);
+	chassis.moveToPoint(-64, -28, 1000, true, 127, false);
+
+	//chassis.turnTo(-50, 0, 1000, true, 127, false);
+
+	chassis.turnTo(-45.871, -59.766, 1000, false, 127, false);
+	intake.move_voltage(0);
+	chassis.moveToPoint(-45.871, -59.766, 3000, false, 127, false);
+
+	chassis.turnTo(100, -60, 1000, false, 127, false);
+	chassis.moveToPoint(-7, -60, 2000, false, 127, false);
 }
+
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -416,7 +439,7 @@ void vsAuton() {
 // ASSET(test6_txt);
 void autonomous() {
 	//skillsAuton();
-	vsAuton();
+	soloAutonWinPoint();
 }
 
 
@@ -463,8 +486,10 @@ void opcontrol() {
 		
 		// set button bindings and velocity of the intake
 		if(master.get_digital(DIGITAL_R2)) {
+			// intake
 			intake.move_voltage(12000);
 		} else if (master.get_digital(DIGITAL_R1)) {
+			// outtake
 			intake.move_voltage(-12000);
 		} else {
 			intake.move_velocity(0);
