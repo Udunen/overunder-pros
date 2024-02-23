@@ -121,10 +121,12 @@ lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensor
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize(); // initialize brain screen
-	chassis.calibrate();
-	while(imu.is_calibrating()) {
-		pros::delay(20);
+	if(COMPETITION_AUTONOMOUS) {
+		pros::lcd::initialize(); // initialize brain screen
+		chassis.calibrate();
+		while(imu.is_calibrating()) {
+			pros::delay(20);
+		}
 	}
 	// master.clear();
 	// pros::Task screenTask([&]() {
@@ -420,6 +422,66 @@ void soloAutonWinPoint() {
 	chassis.moveToPoint(-7, -60, 2000, false, 127, false);
 }
 
+// ASSET(curve_txt);
+// void sixBall() {
+// 	chassis.setPose(14, -60, 270);
+// 	intake.move_voltage(12000);
+// 	chassis.moveToPoint(0, -60, 1000, true, 127, false);
+// 	chassis.moveToPoint(43, -55, 5000, false, 50, false);
+// 	intake.move_voltage(0);
+// 	wings.set_value(true);
+// 	chassis.follow(curve_txt, 1, 2000, false, false);
+// 	// chassis.turnTo(57, -34, 3000, false, 127, false);
+// 	// chassis.moveToPoint(57, -34, 4000, false, 50, false);
+// 	wings.set_value(false);
+// 	// chassis.moveToPoint(62, -44, 4000, false, 127, false);
+// 	// chassis.turnTo(62, 100, 1000, false, 127, false);
+// 	// chassis.moveToPoint(62, -30, 3000, false, 127, false);
+
+// }
+
+void fiveBall() {
+	chassis.setPose(43.871, -59.766, 225);
+	wings.set_value(true);
+	chassis.moveToPoint(53.871, -49.766, 900, false, 127, false);
+	wings.set_value(false);
+	pros::delay(700);
+	chassis.moveToPoint(60.871, -42.766, 800, false, 127, false);
+	left_drive.move_relative(-1.5, 100);
+	chassis.turnTo(chassis.getPose().x, 100, 700, false, 127, false);
+	chassis.moveToPoint(chassis.getPose().x, -28, 1300, false, 127, false);
+	chassis.moveToPoint(54, -39, 1500, true, 127, false);
+
+	chassis.turnTo(5, -24, 400, true, 127, false);
+	intake.move_voltage(12000);
+	chassis.moveToPoint(17, -24, 1500, true, 127, false);
+	//intake.move_voltage(0);
+	
+	chassis.turnTo(46, -9, 500, true, 127, false);
+
+	intake.move_voltage(-12000);
+	chassis.moveToPoint(46, -9, 300, true, 127, false);
+	pros::delay(300);
+	intake.move_voltage(12000);
+	chassis.turnTo(3, 0, 900, true, 127, false);
+	chassis.moveToPoint(3, 0, 1300, true, 80, false);
+	chassis.moveToPoint(9, -8, 900, false, 127, false);
+	chassis.turnTo(100, -8, 700, false, 127, false);
+	intake.move_voltage(0);
+	wings.set_value(true);
+	chassis.moveToPoint(42, -8, 900, false, 127, false);
+	wings.set_value(false);
+	chassis.moveToPoint(27, chassis.getPose().y, 800, true, 127, false);
+	chassis.turnTo(42, chassis.getPose().y, 700, true, 127, false);
+	intake.move_voltage(-12000);
+	chassis.turnTo(-100, chassis.getPose().y, 700, true, 127, false);
+	chassis.moveToPoint(42, chassis.getPose().y, 700, false, 127, false);
+	chassis.moveToPoint(30, chassis.getPose().y, 5000, true, 127, false);
+
+
+}
+
+
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -438,8 +500,8 @@ void soloAutonWinPoint() {
 // ASSET(test5_txt);
 // ASSET(test6_txt);
 void autonomous() {
-	//skillsAuton();
-	soloAutonWinPoint();
+	fiveBall();
+	// fiveBall();
 }
 
 
@@ -473,6 +535,32 @@ void opcontrol() {
 	arm.set_zero_position(arm.get_position());
  
 	while (true) {
+// Official error 404 Code: DO NOT TOUCH
+// plus ben is a nerd
+
+		if(master.get_digital_new_press(DIGITAL_RIGHT) && master.get_digital_new_press(DIGITAL_LEFT) && master.get_digital_new_press(DIGITAL_B)) {
+			arm.set_brake_mode(MOTOR_BRAKE_HOLD);
+			arm.set_zero_position(arm.get_position());
+
+			chassis.setPose(-37.484, -56.18, 90);
+			// go to matchload position 
+			chassis.turnTo(-58.4, -38.199, 500, false, 127, false);
+			chassis.moveToPoint(-58.4, -38.199, 3500, false, 90, false);
+			chassis.turnTo(100, -40, 500, true, 127, false);
+			wings.set_value(true);
+			matchLoad(800, -9000, 25);
+			wings.set_value(false);
+			chassis.moveToPoint(-54.5, -37.199, 400, true, 127, false);
+			pros::delay(400);
+
+			// go to alley
+			chassis.turnTo(-34.484, -60, 500, false, 90, false);
+			chassis.moveToPoint(-37.484, -60, 5000, false, 80, false);
+			chassis.turnTo(38, -62, 1000, false, 60, false);
+			chassis.moveToPoint(38, -62, 5000, false, 80, false);
+		}
+
+
 		drive = master.get_analog(ANALOG_LEFT_Y);
 		turn = master.get_analog(ANALOG_RIGHT_X) / 2.5 * ((int)(abs(drive)/60)*0.5+1);
 
@@ -534,27 +622,7 @@ void opcontrol() {
 			flyWheel.move_velocity(0);
 		}
 
-		if(master.get_digital_new_press(DIGITAL_RIGHT) && master.get_digital_new_press(DIGITAL_R1) && master.get_digital_new_press(DIGITAL_R2)) {
-			arm.set_brake_mode(MOTOR_BRAKE_HOLD);
-			arm.set_zero_position(arm.get_position());
-
-			chassis.setPose(-37.484, -56.18, 90);
-			// go to matchload position
-			chassis.turnTo(-58.4, -38.199, 500, false, 127, false);
-			chassis.moveToPoint(-58.4, -38.199, 3500, false, 90, false);
-			chassis.turnTo(100, -40, 500, true, 127, false);
-			wings.set_value(true);
-			matchLoad(800, -9000, 25);
-			wings.set_value(false);
-			chassis.moveToPoint(-54.5, -37.199, 400, true, 127, false);
-			pros::delay(400);
-
-			// go to alley
-			chassis.turnTo(-34.484, -60, 500, false, 90, false);
-			chassis.moveToPoint(-37.484, -60, 5000, false, 80, false);
-			chassis.turnTo(38, -62, 1000, false, 60, false);
-			chassis.moveToPoint(38, -62, 5000, false, 80, false);
-		}
+		
 
 		
 	}
