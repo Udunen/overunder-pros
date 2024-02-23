@@ -454,26 +454,28 @@ void fiveBall() {
 
 	chassis.turnTo(5, -24, 400, true, 127, false);
 	intake.move_voltage(12000);
-	chassis.moveToPoint(17, -24, 1500, true, 127, false);
+	chassis.moveToPoint(16, -24, 1500, true, 127, false);
 	//intake.move_voltage(0);
 	
-	chassis.turnTo(46, -9, 500, true, 127, false);
+	chassis.turnTo(42, 2, 500, true, 127, false);
 
 	intake.move_voltage(-12000);
-	chassis.moveToPoint(46, -9, 300, true, 127, false);
+	chassis.moveToPoint(42, 2, 200, true, 127, false);
 	pros::delay(300);
+	chassis.moveToPoint(40, 0, 200, false, 127, false);
 	intake.move_voltage(12000);
 	chassis.turnTo(3, 0, 900, true, 127, false);
 	chassis.moveToPoint(3, 0, 1300, true, 80, false);
-	chassis.moveToPoint(9, -8, 900, false, 127, false);
-	chassis.turnTo(100, -8, 700, false, 127, false);
-	intake.move_voltage(0);
+	chassis.moveToPoint(9, -7, 900, false, 127, false);
 	wings.set_value(true);
-	chassis.moveToPoint(42, -8, 900, false, 127, false);
+	chassis.turnTo(42, chassis.getPose().y, 700, false, 127, false);
+	chassis.moveToPoint(42, chassis.getPose().y, 900, false, 127, false);
 	wings.set_value(false);
 	chassis.moveToPoint(27, chassis.getPose().y, 800, true, 127, false);
 	chassis.turnTo(42, chassis.getPose().y, 700, true, 127, false);
 	intake.move_voltage(-12000);
+	chassis.moveToPoint(42, chassis.getPose().y, 200, false, 127, false);
+	chassis.moveToPoint(18, chassis.getPose().y, 600, true, 127, false);
 	chassis.turnTo(-100, chassis.getPose().y, 700, true, 127, false);
 	chassis.moveToPoint(42, chassis.getPose().y, 700, false, 127, false);
 	chassis.moveToPoint(30, chassis.getPose().y, 5000, true, 127, false);
